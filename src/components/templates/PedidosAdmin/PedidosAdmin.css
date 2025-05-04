@@ -1,0 +1,97 @@
+/* src/components/templates/PedidosAdmin/PedidosAdmin.css */
+.pedidos-admin-page {
+    padding: 40px 0;
+    background-color: #f9f9f9;
+  }
+  
+  .pedidos-admin-page h1 {
+    color: #008040;
+    margin-bottom: 10px;
+  }
+  
+  .pedidos-admin-page p {
+    color: #666;
+    margin-bottom: 30px;
+  }
+  
+  .pedidos-table-container {
+    background-color: white;
+    border-radius: 10px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+    padding: 20px;
+    overflow-x: auto;
+  }
+  
+  .pedidos-table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+  
+  .pedidos-table th {
+    background-color: #f1f1f1;
+    padding: 12px 15px;
+    text-align: left;
+    font-weight: 600;
+    color: #333;
+  }
+  
+  .pedidos-table td {
+    padding: 12px 15px;
+    border-bottom: 1px solid #eee;
+  }
+  
+  .pedidos-table tr:last-child td {
+    border-bottom: none;
+  }
+  
+  .estado-badge {
+    padding: 5px 10px;
+    border-radius: 50px;
+    font-size: 0.8rem;
+    font-weight: 600;
+  }
+  
+  .estado-badge.pendiente {
+    background-color: #ffecb3;
+    color: #856404;
+  }
+  
+  .estado-badge.completado {
+    background-color: #d4edda;
+    color: #155724;
+  }
+  
+  .estado-badge.en-proceso {
+    background-color: #cce5ff;
+    color: #004085;
+  }
+  
+  .action-buttons {
+    display: flex;
+    gap: 8px;
+  }
+  
+  .btn-view, .btn-edit {
+    padding: 5px 10px;
+    border-radius: 4px;
+    font-size: 0.8rem;
+    cursor: pointer;
+    border: none;
+  }
+  
+  .btn-view {
+    background-color: #cce5ff;
+    color: #004085;
+  }
+  
+  .btn-edit {
+    background-color: #d4edda;
+    color: #155724;
+  }
+  
+  @media (max-width: 768px) {
+    .pedidos-table th:nth-child(3),
+    .pedidos-table td:nth-child(3) {
+      display: none;
+    }
+  }

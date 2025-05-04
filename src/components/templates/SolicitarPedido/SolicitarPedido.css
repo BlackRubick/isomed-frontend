@@ -1,0 +1,160 @@
+/* src/components/templates/SolicitarPedido/SolicitarPedido.css */
+.solicitar-pedido-page {
+    padding: 40px 0;
+    background-color: #f9f9f9;
+  }
+  
+  .solicitar-pedido-page h1 {
+    color: #008040;
+    margin-bottom: 10px;
+  }
+  
+  .solicitar-pedido-page > .container > p {
+    color: #666;
+    margin-bottom: 30px;
+  }
+  
+  .pedido-form-container {
+    background-color: white;
+    border-radius: 10px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+    padding: 30px;
+  }
+  
+  .pedido-form {
+    display: flex;
+    flex-direction: column;
+    gap: 30px;
+  }
+  
+  .form-section {
+    border-bottom: 1px solid #eee;
+    padding-bottom: 20px;
+  }
+  
+  .form-section:last-child {
+    border-bottom: none;
+  }
+  
+  .form-section h3 {
+    color: #008040;
+    margin-bottom: 20px;
+    font-size: 1.2rem;
+  }
+  
+  .form-row {
+    display: flex;
+    gap: 20px;
+  }
+  
+  .form-group {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-bottom: 15px;
+  }
+  
+  .form-group label {
+    font-weight: 600;
+    color: #333;
+    font-size: 0.9rem;
+  }
+  
+  .form-group input,
+  .form-group select,
+  .form-group textarea {
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    font-family: inherit;
+    font-size: 1rem;
+  }
+  
+  .form-group input:focus,
+  .form-group select:focus,
+  .form-group textarea:focus {
+    outline: none;
+    border-color: #008040;
+    box-shadow: 0 0 0 2px rgba(0, 128, 64, 0.1);
+  }
+  
+  .btn-submit {
+    background-color: #008040;
+    color: white;
+    border: none;
+    padding: 14px;
+    font-size: 1rem;
+    font-weight: 600;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    margin-top: 20px;
+  }
+  
+  .btn-submit:hover {
+    background-color: #006633;
+    transform: translateY(-2px);
+  }
+  
+  .success-message {
+    background-color: white;
+    border-radius: 10px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+    padding: 40px;
+    text-align: center;
+  }
+  
+  .icon-container {
+    width: 70px;
+    height: 70px;
+    background-color: #d4edda;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 20px;
+  }
+  
+  .icon-container svg {
+    width: 40px;
+    height: 40px;
+    color: #155724;
+  }
+  
+  .success-message h2 {
+    color: #155724;
+    margin-bottom: 15px;
+  }
+  
+  .success-message p {
+    color: #666;
+    margin-bottom: 25px;
+  }
+  
+  .btn-primary {
+    background-color: #008040;
+    color: white;
+    border: none;
+    padding: 12px 25px;
+    font-size: 1rem;
+    font-weight: 600;
+    border-radius: 50px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+  }
+  
+  .btn-primary:hover {
+    background-color: #006633;
+  }
+  
+  @media (max-width: 768px) {
+    .form-row {
+      flex-direction: column;
+      gap: 0;
+    }
+    
+    .pedido-form-container {
+      padding: 20px;
+    }
+  }

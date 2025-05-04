@@ -4,7 +4,8 @@ import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { AppContext } from '../../../context/AppContext';
 import './Login.css';
 
-const API_URL = 'http://34.232.185.39:8000';
+// URL base de la API - definida directamente sin usar process.env
+const API_URL = 'http://34.232.185.39:8000'; // Cambia esto a la URL de tu API
 
 const Login = () => {
   const [email, setEmail] = useState('');
@@ -30,6 +31,17 @@ const Login = () => {
     setError('');
     setDebugInfo(null);
     setLoading(true);
+    
+    // Verificar si es el usuario admin
+    if (email === 'admin@hotmail.com' && password === 'admin123') {
+      login({
+        email,
+        password,
+        name: 'Administrador'
+      });
+      navigate('/');
+      return;
+    }
     
     console.log(`Intentando login para el correo: ${email}`);
     console.log(`URL de la API: ${API_URL}/api/auth/login`);
@@ -65,8 +77,11 @@ const Login = () => {
         throw new Error(data?.detail || data?.message || 'Credenciales incorrectas');
       }
       
-      // Usar la función de login del contexto en lugar de guardar manualmente
-      login(data.user);
+      // Usar la función de login del contexto
+      login({
+        ...data.user,
+        email: email // Asegurarnos de que el email está en el objeto usuario
+      });
       
       console.log('Login exitoso, redirigiendo...');
       
@@ -85,10 +100,9 @@ const Login = () => {
     }
   };
 
-  // Resto del componente queda igual...
+  // Resto del componente se mantiene igual
   return (
     <div className="login-container">
-      {/* El resto del código del componente queda igual */}
       <div className="login-card">
         <div className="login-header">
           <h2>Iniciar Sesión</h2>

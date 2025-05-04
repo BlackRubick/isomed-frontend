@@ -8,7 +8,7 @@ import './Navbar.css';
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [showUserMenu, setShowUserMenu] = useState(false);
-  const { isAuthenticated, user, logout } = useContext(AppContext);
+  const { isAuthenticated, user, isAdmin, logout } = useContext(AppContext);
   
   const navigate = useNavigate();
 
@@ -37,6 +37,12 @@ const Navbar = () => {
         <NavItem link="/productos" text="Productos" />
         <NavItem link="/nosotros" text="Nosotros" />
         <NavItem link="/contacto" text="Contacto" />
+        {isAuthenticated && isAdmin && (
+          <NavItem link="/pedidos-admin" text="Ver Pedidos" />
+        )}
+        {isAuthenticated && !isAdmin && (
+          <NavItem link="/solicitar-pedido" text="Solicitar Pedido" />
+        )}
       </ul>
       
       <div className="auth-buttons">
@@ -48,6 +54,7 @@ const Navbar = () => {
               </span>
               <span className="user-name">
                 {user?.name || 'Usuario'}
+                {isAdmin && ' (Admin)'}
               </span>
               <svg 
                 className={`dropdown-icon ${showUserMenu ? 'active' : ''}`} 
@@ -67,9 +74,21 @@ const Navbar = () => {
             
             {showUserMenu && (
               <div className="user-dropdown">
-                <NavLink to="/profile" className="dropdown-item">Mi Perfil</NavLink>
-                <NavLink to="/orders" className="dropdown-item">Mis Pedidos</NavLink>
-                <NavLink to="/settings" className="dropdown-item">Configuración</NavLink>
+                {isAdmin ? (
+                  // Menú para admin
+                  <>
+                    <NavLink to="/panel-admin" className="dropdown-item">Panel de Admin</NavLink>
+                    <NavLink to="/pedidos-admin" className="dropdown-item">Gestión de Pedidos</NavLink>
+                    <NavLink to="/usuarios" className="dropdown-item">Usuarios</NavLink>
+                  </>
+                ) : (
+                  // Menú para usuarios normales
+                  <>
+                    <NavLink to="/profile" className="dropdown-item">Mi Perfil</NavLink>
+                    <NavLink to="/mis-pedidos" className="dropdown-item">Mis Pedidos</NavLink>
+                    <NavLink to="/settings" className="dropdown-item">Configuración</NavLink>
+                  </>
+                )}
                 <button onClick={handleLogout} className="dropdown-item logout">
                   Cerrar Sesión
                 </button>
