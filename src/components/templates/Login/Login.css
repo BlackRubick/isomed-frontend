@@ -1,0 +1,130 @@
+.login-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 80vh;
+    padding: 40px 20px;
+    background-color: #f9f9f9;
+  }
+  
+  .login-card {
+    width: 100%;
+    max-width: 450px;
+    background-color: white;
+    border-radius: 10px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+    padding: 40px;
+  }
+  
+  .login-header {
+    text-align: center;
+    margin-bottom: 30px;
+  }
+  
+  .login-header h2 {
+    color: #008040;
+    font-size: 2rem;
+    margin-bottom: 10px;
+  }
+  
+  .login-header p {
+    color: #666;
+    font-size: 1rem;
+  }
+  
+  .login-error {
+    background-color: #ffe8e8;
+    color: #d32f2f;
+    border-radius: 5px;
+    padding: 12px;
+    margin-bottom: 20px;
+    text-align: center;
+    font-size: 0.9rem;
+  }
+  
+  .login-form {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+  }
+  
+  .form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  
+  .form-group label {
+    color: #333;
+    font-weight: 600;
+    font-size: 0.9rem;
+  }
+  
+  .form-group input {
+    padding: 12px 15px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    font-size: 1rem;
+    transition: border-color 0.3s ease;
+  }
+  
+  .form-group input:focus {
+    border-color: #008040;
+    outline: none;
+    box-shadow: 0 0 0 2px rgba(0, 128, 64, 0.1);
+  }
+  
+  .login-button {
+    background-color: #008040;
+    color: white;
+    border: none;
+    padding: 14px;
+    font-size: 1rem;
+    font-weight: 600;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    margin-top: 10px;
+  }
+  
+  .login-button:hover {
+    background-color: #006633;
+  }
+  
+  .login-button:disabled {
+    background-color: #cccccc;
+    cursor: not-allowed;
+  }
+  
+  .login-footer {
+    text-align: center;
+    margin-top: 30px;
+    color: #666;
+    font-size: 0.9rem;
+  }
+  
+  .login-footer p {
+    margin-bottom: 10px;
+  }
+  
+  .login-footer a {
+    color: #008040;
+    text-decoration: none;
+    font-weight: 600;
+    transition: color 0.3s ease;
+  }
+  
+  .login-footer a:hover {
+    color: #006633;
+    text-decoration: underline;
+  }
+  
+  @media (max-width: 576px) {
+    .login-card {
+      padding: 30px 20px;
+    }
+    
+    .login-header h2 {
+      font-size: 1.7rem;
+    }
+  }

@@ -1,0 +1,416 @@
+.home-page {
+  font-family: 'Poppins', sans-serif;
+  color: #333;
+}
+
+.main-content {
+  min-height: 100vh;
+}
+
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 20px;
+}
+
+/* Hero Section */
+.hero-section {
+  background: linear-gradient(rgba(0, 128, 64, 0.8), rgba(0, 128, 64, 0.8)), url('/assets/images/hero-image.jpg');
+  background-size: cover;
+  background-position: center;
+  height: 500px;
+  display: flex;
+  align-items: center;
+  color: white;
+  text-align: center;
+}
+
+.hero-section h1 {
+  font-size: 2.5rem;
+  font-weight: 700;
+  margin-bottom: 1rem;
+  text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+}
+
+.hero-section p {
+  font-size: 1.2rem;
+  margin-bottom: 2rem;
+}
+
+.btn-primary {
+  background-color: #fff;
+  color: #008040;
+  border: none;
+  padding: 12px 30px;
+  font-size: 1rem;
+  font-weight: 600;
+  border-radius: 50px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+}
+
+.btn-primary:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 6px 8px rgba(0,0,0,0.15);
+}
+
+/* Welcome Section */
+.welcome-section {
+  padding: 80px 0;
+  background-color: white;
+}
+
+.welcome-content {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 40px;
+  align-items: start;
+}
+
+.welcome-text h2 {
+  color: #008040;
+  font-size: 2rem;
+  margin-bottom: 25px;
+  position: relative;
+}
+
+.welcome-text h2::after {
+  content: '';
+  position: absolute;
+  bottom: -10px;
+  left: 0;
+  width: 60px;
+  height: 3px;
+  background-color: #008040;
+}
+
+.welcome-text p {
+  margin-bottom: 20px;
+  line-height: 1.7;
+  color: #555;
+}
+
+.welcome-sidebar {
+  position: sticky;
+  top: 120px;
+}
+
+/* Services Preview */
+.services-preview {
+  padding: 80px 0;
+  background-color: #f9f9f9;
+}
+
+.services-preview h2 {
+  text-align: center;
+  font-size: 2rem;
+  margin-bottom: 3rem;
+  color: #008040;
+}
+
+.services-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 30px;
+}
+
+.service-card {
+  background-color: white;
+  border-radius: 10px;
+  padding: 30px;
+  box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+  transition: all 0.3s ease;
+  text-align: center;
+}
+
+.service-card:hover {
+  transform: translateY(-10px);
+  box-shadow: 0 15px 30px rgba(0,0,0,0.1);
+}
+
+.service-icon {
+  width: 70px;
+  height: 70px;
+  background-color: rgba(0, 128, 64, 0.1);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 20px;
+}
+
+.service-icon svg {
+  width: 32px;
+  height: 32px;
+  color: #008040;
+}
+
+.svg-icon {
+  width: 100%;
+  height: 100%;
+}
+
+.service-card h3 {
+  font-size: 1.2rem;
+  margin-bottom: 15px;
+  color: #008040;
+}
+
+.service-card p {
+  font-size: 0.9rem;
+  color: #666;
+  line-height: 1.6;
+}
+
+/* Nephrology Section */
+.nephrology-section {
+  padding: 80px 0;
+  background-color: white;
+}
+
+.nephrology-content {
+  display: grid;
+  grid-template-columns: 3fr 2fr;
+  gap: 40px;
+}
+
+.nephrology-text h2 {
+  color: #008040;
+  font-size: 2rem;
+  margin-bottom: 25px;
+  position: relative;
+}
+
+.nephrology-text h2::after {
+  content: '';
+  position: absolute;
+  bottom: -10px;
+  left: 0;
+  width: 60px;
+  height: 3px;
+  background-color: #008040;
+}
+
+.nephrology-text p {
+  margin-bottom: 20px;
+  line-height: 1.7;
+  color: #555;
+}
+
+.news-sidebar {
+  display: flex;
+  flex-direction: column;
+  gap: 30px;
+}
+
+.news-section {
+  background-color: #f9f9f9;
+  border-radius: 10px;
+  padding: 30px;
+  box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+}
+
+.news-section h3 {
+  color: #008040;
+  font-size: 1.3rem;
+  margin-bottom: 20px;
+  padding-bottom: 10px;
+  border-bottom: 2px solid rgba(0, 128, 64, 0.1);
+  text-align: center;
+}
+
+.news-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.news-list li {
+  margin-bottom: 15px;
+  padding-bottom: 15px;
+  border-bottom: 1px solid #eee;
+}
+
+.news-list li:last-child {
+  margin-bottom: 0;
+  padding-bottom: 0;
+  border-bottom: none;
+}
+
+.news-list a {
+  color: #008040;
+  text-decoration: none;
+  transition: color 0.3s ease;
+  display: block;
+  font-weight: 500;
+}
+
+.news-list a:hover {
+  color: #006633;
+  text-decoration: underline;
+}
+
+.news-image {
+  border-radius: 10px;
+  overflow: hidden;
+  box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+}
+
+.news-image img {
+  width: 100%;
+  height: auto;
+  display: block;
+  transition: transform 0.5s ease;
+}
+
+.news-image:hover img {
+  transform: scale(1.05);
+}
+
+/* CTA Section */
+.cta-section {
+  background-color: #008040;
+  color: white;
+  padding: 80px 0;
+  text-align: center;
+}
+
+.cta-section h2 {
+  font-size: 2rem;
+  margin-bottom: 1rem;
+}
+
+.cta-section p {
+  font-size: 1.1rem;
+  margin-bottom: 2rem;
+  max-width: 600px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.btn-secondary {
+  background-color: transparent;
+  color: white;
+  border: 2px solid white;
+  padding: 12px 30px;
+  font-size: 1rem;
+  font-weight: 600;
+  border-radius: 50px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-decoration: none;
+  display: inline-block;
+}
+
+.btn-secondary:hover {
+  background-color: white;
+  color: #008040;
+}
+
+/* Usando una clase más específica con !important para asegurar que se aplique */
+a.btn-secondary.whatsapp-btn {
+  background-color: white !important;
+  border-color: white !important;
+  color: #25D366 !important;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+a.btn-secondary.whatsapp-btn:hover {
+  background-color: #f5f5f5 !important;
+  border-color: #f5f5f5 !important;
+  color: #128C7E !important;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+/* Related Articles */
+.related-articles {
+  background-color: #fff;
+  border-radius: 10px;
+  box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+  padding: 30px;
+  height: 100%;
+}
+
+.related-articles h3 {
+  color: #008040;
+  font-size: 1.3rem;
+  margin-bottom: 20px;
+  padding-bottom: 10px;
+  border-bottom: 2px solid rgba(0, 128, 64, 0.1);
+}
+
+.related-articles ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.related-articles li {
+  margin-bottom: 15px;
+  padding-bottom: 15px;
+  border-bottom: 1px solid #eee;
+}
+
+.related-articles li:last-child {
+  margin-bottom: 0;
+  padding-bottom: 0;
+  border-bottom: none;
+}
+
+.related-articles a {
+  color: #008040;
+  text-decoration: none;
+  transition: color 0.3s ease;
+  display: block;
+  font-weight: 500;
+  position: relative;
+  padding-left: 20px;
+}
+
+.related-articles a:hover {
+  color: #006633;
+  text-decoration: underline;
+}
+
+.related-articles a::before {
+  content: '•';
+  position: absolute;
+  left: 0;
+  top: 0;
+  color: #008040;
+  font-weight: bold;
+}
+
+/* Responsive */
+@media (max-width: 992px) {
+  .welcome-content,
+  .nephrology-content {
+    grid-template-columns: 1fr;
+  }
+  
+  .welcome-sidebar {
+    position: static;
+  }
+}
+
+@media (max-width: 768px) {
+  .hero-section {
+    height: 400px;
+  }
+  
+  .hero-section h1 {
+    font-size: 1.8rem;
+  }
+  
+  .services-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .welcome-text h2,
+  .nephrology-text h2 {
+    font-size: 1.7rem;
+  }
+}

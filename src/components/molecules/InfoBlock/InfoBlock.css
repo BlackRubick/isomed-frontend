@@ -1,0 +1,12 @@
+.info-block {
+  margin-bottom: 2rem;
+}
+
+.info-block h3 {
+  color: var(--primary-color);
+  margin-bottom: 0.5rem;
+}
+
+.info-block p {
+  line-height: 1.6;
+}

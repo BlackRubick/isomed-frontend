@@ -1,0 +1,13 @@
+.contacto-template {
+  padding: 3rem 0;
+}
+
+.location {
+  margin-top: 3rem;
+}
+
+.map {
+  height: 400px;
+  background-color: #f0f0f0;
+  margin-top: 1.5rem;
+}

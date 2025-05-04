@@ -1,0 +1,272 @@
+.servicios-page {
+  font-family: 'Poppins', sans-serif;
+  color: #333;
+}
+
+.main-content {
+  min-height: 100vh;
+}
+
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 20px;
+}
+
+/* Hero Section */
+.hero-section {
+  background: linear-gradient(rgba(0, 128, 64, 0.8), rgba(0, 128, 64, 0.8)), url('/assets/images/servicios-hero.jpg');
+  background-size: cover;
+  background-position: center;
+  height: 300px;
+  display: flex;
+  align-items: center;
+  color: white;
+  text-align: center;
+}
+
+.hero-section h1 {
+  font-size: 2.5rem;
+  font-weight: 700;
+  margin-bottom: 1rem;
+  text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+}
+
+.hero-section p {
+  font-size: 1.2rem;
+}
+
+/* Servicios Section */
+.servicios-section {
+  padding: 60px 0;
+  background-color: #f9f9f9;
+}
+
+.servicios-content {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 40px;
+}
+
+/* Servicios List */
+.servicios-list {
+  display: flex;
+  flex-direction: column;
+  gap: 30px;
+}
+
+.servicio-item {
+  background-color: #fff;
+  border-radius: 10px;
+  box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.servicio-item:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 15px 30px rgba(0,0,0,0.1);
+}
+
+.servicio-image {
+  position: relative;
+  height: 250px;
+  overflow: hidden;
+}
+
+.servicio-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.5s ease;
+}
+
+.servicio-item:hover .servicio-image img {
+  transform: scale(1.05);
+}
+
+.servicio-details {
+  padding: 25px;
+}
+
+.servicio-details h2 {
+  color: #008040;
+  font-size: 1.5rem;
+  margin-bottom: 15px;
+}
+
+.servicio-details p {
+  color: #666;
+  line-height: 1.6;
+}
+
+/* Sidebar */
+.servicios-sidebar {
+  display: flex;
+  flex-direction: column;
+  gap: 30px;
+}
+
+.contact-card, .related-articles {
+  background-color: #fff;
+  border-radius: 10px;
+  box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+  padding: 30px;
+}
+
+.contact-card h3, .related-articles h3 {
+  color: #008040;
+  font-size: 1.3rem;
+  margin-bottom: 20px;
+  padding-bottom: 10px;
+  border-bottom: 2px solid rgba(0, 128, 64, 0.1);
+}
+
+.contact-card p {
+  margin-bottom: 15px;
+  line-height: 1.6;
+  color: #666;
+}
+
+.contact-card a {
+  color: #008040;
+  text-decoration: none;
+  transition: color 0.3s ease;
+}
+
+.contact-card a:hover {
+  color: #006633;
+  text-decoration: underline;
+}
+
+.contact-info {
+  margin: 20px 0;
+  padding: 15px;
+  background-color: rgba(0, 128, 64, 0.05);
+  border-radius: 8px;
+}
+
+.contact-info p {
+  margin-bottom: 5px;
+}
+
+.btn-primary {
+  background-color: #008040;
+  color: white;
+  border: none;
+  padding: 12px 30px;
+  font-size: 1rem;
+  font-weight: 600;
+  border-radius: 50px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+  width: 100%;
+  margin-top: 15px;
+}
+
+.btn-primary:hover {
+  background-color: #006633;
+  transform: translateY(-3px);
+  box-shadow: 0 6px 8px rgba(0,0,0,0.15);
+}
+
+.related-articles ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.related-articles li {
+  margin-bottom: 15px;
+  padding-bottom: 15px;
+  border-bottom: 1px solid #eee;
+}
+
+.related-articles li:last-child {
+  margin-bottom: 0;
+  padding-bottom: 0;
+  border-bottom: none;
+}
+
+.related-articles a {
+  color: #008040;
+  text-decoration: none;
+  transition: color 0.3s ease;
+  display: block;
+  font-weight: 500;
+}
+
+.related-articles a:hover {
+  color: #006633;
+  text-decoration: underline;
+}
+
+/* CTA Section */
+.cta-section {
+  background-color: #008040;
+  color: white;
+  padding: 60px 0;
+  text-align: center;
+}
+
+.cta-section h2 {
+  font-size: 2rem;
+  margin-bottom: 1rem;
+}
+
+.cta-section p {
+  font-size: 1.1rem;
+  margin-bottom: 2rem;
+  max-width: 600px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.btn-secondary {
+  background-color: transparent;
+  color: white;
+  border: 2px solid white;
+  padding: 12px 30px;
+  font-size: 1rem;
+  font-weight: 600;
+  border-radius: 50px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.btn-secondary:hover {
+  background-color: white;
+  color: #008040;
+}
+
+/* Responsive Styles */
+@media (max-width: 992px) {
+  .servicios-content {
+    grid-template-columns: 1fr;
+  }
+  
+  .servicios-sidebar {
+    order: -1;
+  }
+}
+
+@media (max-width: 768px) {
+  .hero-section {
+    height: 250px;
+  }
+  
+  .hero-section h1 {
+    font-size: 2rem;
+  }
+  
+  .servicio-image {
+    height: 200px;
+  }
+  
+  .servicio-details h2 {
+    font-size: 1.3rem;
+  }
+}

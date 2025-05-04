@@ -1,0 +1,92 @@
+.historia-section {
+  padding: 80px 0;
+  background-color: white;
+}
+
+.historia-content {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 50px;
+  align-items: center;
+}
+
+.historia-text h2 {
+  font-size: 2rem;
+  color: #008040;
+  margin-bottom: 25px;
+  position: relative;
+}
+
+.historia-text h2::after {
+  content: '';
+  position: absolute;
+  bottom: -10px;
+  left: 0;
+  width: 60px;
+  height: 3px;
+  background-color: #008040;
+}
+
+.historia-text p {
+  margin-bottom: 20px;
+  line-height: 1.7;
+  color: #555;
+}
+
+.director-info {
+  margin-top: 30px;
+  border-left: 3px solid #008040;
+  padding-left: 15px;
+}
+
+.director-name {
+  font-weight: 600;
+  font-size: 1.1rem;
+  margin-bottom: 5px !important;
+}
+
+.director-title {
+  font-weight: 500;
+  color: #008040;
+  letter-spacing: 1px;
+}
+
+.historia-image {
+  position: relative;
+  border-radius: 10px;
+  overflow: hidden;
+  box-shadow: 0 15px 30px rgba(0,0,0,0.1);
+}
+
+.historia-image img {
+  width: 100%;
+  height: auto;
+  display: block;
+  transition: transform 0.5s ease;
+}
+
+.historia-image:hover img {
+  transform: scale(1.05);
+}
+
+.image-caption {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: linear-gradient(to top, rgba(0,0,0,0.7), transparent);
+  padding: 20px;
+  color: white;
+  font-size: 0.9rem;
+}
+
+@media (max-width: 768px) {
+  .historia-content {
+    grid-template-columns: 1fr;
+  }
+  
+  .historia-image {
+    order: -1;
+    margin-bottom: 30px;
+  }
+}

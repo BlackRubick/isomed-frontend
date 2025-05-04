@@ -1,0 +1,35 @@
+.btn {
+  font-family: 'Poppins', sans-serif;
+  font-weight: 600;
+  border-radius: 50px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  padding: 12px 30px;
+  font-size: 1rem;
+  display: inline-block;
+  text-align: center;
+}
+
+.btn-primary {
+  background-color: #008040;
+  color: white;
+  border: none;
+  box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+}
+
+.btn-primary:hover {
+  background-color: #006633;
+  transform: translateY(-3px);
+  box-shadow: 0 6px 8px rgba(0,0,0,0.15);
+}
+
+.btn-secondary {
+  background-color: transparent;
+  color: #008040;
+  border: 2px solid #008040;
+}
+
+.btn-secondary:hover {
+  background-color: #008040;
+  color: white;
+}
