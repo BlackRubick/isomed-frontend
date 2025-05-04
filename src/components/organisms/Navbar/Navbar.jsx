@@ -1,26 +1,16 @@
-import React, { useState, useEffect } from 'react';
+// src/components/organisms/Navbar/Navbar.jsx
+import React, { useState, useContext } from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
 import NavItem from '../../molecules/NavItem/NavItem';
+import { AppContext } from '../../../context/AppContext';
 import './Navbar.css';
 
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [user, setUser] = useState(null);
   const [showUserMenu, setShowUserMenu] = useState(false);
+  const { isAuthenticated, user, logout } = useContext(AppContext);
   
   const navigate = useNavigate();
-
-  // Verificar si el usuario está autenticado
-  useEffect(() => {
-    const auth = localStorage.getItem('isAuthenticated');
-    const userData = localStorage.getItem('user');
-    
-    if (auth === 'true' && userData) {
-      setIsAuthenticated(true);
-      setUser(JSON.parse(userData));
-    }
-  }, []);
 
   const toggleMenu = () => {
     setIsOpen(!isOpen);
@@ -31,10 +21,7 @@ const Navbar = () => {
   };
   
   const handleLogout = () => {
-    localStorage.removeItem('isAuthenticated');
-    localStorage.removeItem('user');
-    setIsAuthenticated(false);
-    setUser(null);
+    logout();  // Utilizamos la función de logout del contexto
     navigate('/');
   };
 

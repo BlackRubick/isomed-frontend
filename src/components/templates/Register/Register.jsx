@@ -3,7 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import './Register.css';
 
 // URL base de la API - definida directamente sin usar process.env
-const API_URL = 'http://localhost:8000'; // Cambia esto a la URL de tu API
+const API_URL = 'http://34.232.185.39:8000'; // Cambia esto a la URL de tu API
 
 const Register = () => {
   const [formData, setFormData] = useState({
@@ -50,7 +50,6 @@ const Register = () => {
     console.log('Enviando datos de registro:', JSON.stringify(formData));
     
     try {
-      // Llamada real a la API
       const response = await fetch(`${API_URL}/api/auth/register`, {
         method: 'POST',
         headers: { 
@@ -58,7 +57,6 @@ const Register = () => {
           'Accept': 'application/json' 
         },
         body: JSON.stringify(formData),
-        credentials: 'include'
       });
       
       console.log('Código de estado HTTP:', response.status);

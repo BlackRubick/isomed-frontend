@@ -1,9 +1,10 @@
-import React, { useState, useEffect } from 'react';
+// src/components/templates/Login/Login.jsx
+import React, { useState, useEffect, useContext } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
+import { AppContext } from '../../../context/AppContext';
 import './Login.css';
 
-// URL base de la API - definida directamente sin usar process.env
-const API_URL = 'http://localhost:8000'; // Cambia esto a la URL de tu API
+const API_URL = 'http://34.232.185.39:8000';
 
 const Login = () => {
   const [email, setEmail] = useState('');
@@ -14,6 +15,7 @@ const Login = () => {
   
   const navigate = useNavigate();
   const location = useLocation();
+  const { login } = useContext(AppContext);
   
   // Verificar si hay un mensaje de registro exitoso
   useEffect(() => {
@@ -41,7 +43,6 @@ const Login = () => {
           'Accept': 'application/json'
         },
         body: JSON.stringify({ email, password }),
-        credentials: 'include'
       });
       
       console.log(`Código de estado de la respuesta: ${response.status}`);
@@ -64,10 +65,8 @@ const Login = () => {
         throw new Error(data?.detail || data?.message || 'Credenciales incorrectas');
       }
       
-      // Guardar token y datos de usuario en localStorage
-      localStorage.setItem('token', data.token);
-      localStorage.setItem('isAuthenticated', 'true');
-      localStorage.setItem('user', JSON.stringify(data.user));
+      // Usar la función de login del contexto en lugar de guardar manualmente
+      login(data.user);
       
       console.log('Login exitoso, redirigiendo...');
       
@@ -86,8 +85,10 @@ const Login = () => {
     }
   };
 
+  // Resto del componente queda igual...
   return (
     <div className="login-container">
+      {/* El resto del código del componente queda igual */}
       <div className="login-card">
         <div className="login-header">
           <h2>Iniciar Sesión</h2>
