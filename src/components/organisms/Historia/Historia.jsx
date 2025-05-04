@@ -23,7 +23,7 @@ const Historia = () => {
             </div>
           </div>
           <div className="historia-image">
-            <img src="src/assets/images/dialisis.jpg" alt="Equipo de hemodiálisis" />
+            <img src="/assets/images/mantenimiento.jpeg" alt="Equipo de hemodiálisis" />
             <div className="image-caption">
               <span>ISOMED - Servicio, calidad y profesionalismo en el sector médico</span>
             </div>

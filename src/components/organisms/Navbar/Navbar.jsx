@@ -21,7 +21,7 @@ const Navbar = () => {
   };
   
   const handleLogout = () => {
-    logout();  // Utilizamos la función de logout del contexto
+    logout();  
     navigate('/');
   };
 

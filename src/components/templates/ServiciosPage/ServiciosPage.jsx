@@ -21,7 +21,7 @@ const ServiciosPage = () => {
               <div className="servicios-list">
                 <div className="servicio-item">
                   <div className="servicio-image">
-                    <img src="src/assets/images/tratamiento2.jpeg" alt="Tratamiento de Agua" />
+                    <img src="/assets/images/tratamiento2.jpeg" alt="Tratamiento de Agua" />
                   </div>
                   <div className="servicio-details">
                     <h2>Diseño de Tratamientos de Agua</h2>
@@ -31,7 +31,7 @@ const ServiciosPage = () => {
                 
                 <div className="servicio-item">
                   <div className="servicio-image">
-                    <img src="src/assets/images/venta.jpeg" alt="Plantas de Tratamiento" />
+                    <img src="/assets/images/venta.jpeg" alt="Plantas de Tratamiento" />
                   </div>
                   <div className="servicio-details">
                     <h2>Venta de Plantas de Tratamiento de agua</h2>
@@ -41,7 +41,7 @@ const ServiciosPage = () => {
                 
                 <div className="servicio-item">
                   <div className="servicio-image">
-                    <img src="src/assets/images/mantenimiento.jpeg" alt="Mantenimiento de Equipos" />
+                    <img src="/assets/images/mantenimiento.jpeg" alt="Mantenimiento de Equipos" />
                   </div>
                   <div className="servicio-details">
                     <h2>Mantenimiento de Equipos</h2>
@@ -51,7 +51,7 @@ const ServiciosPage = () => {
                 
                 <div className="servicio-item">
                   <div className="servicio-image">
-                    <img src="src/assets/images/insumos.jpeg" alt="Insumos Médicos" />
+                    <img src="/assets/images/insumos.jpeg" alt="Insumos Médicos" />
                   </div>
                   <div className="servicio-details">
                     <h2>Insumos Médicos</h2>

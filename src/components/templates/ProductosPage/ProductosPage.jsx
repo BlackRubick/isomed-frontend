@@ -30,7 +30,7 @@ const ProductosPage = () => {
             <div className="productos-gallery">
               <div className="producto-item">
                 <div className="producto-image">
-                  <img src="src/assets/images/tratamiento2.jpeg" alt="Sistema Portátil de Ósmosis Inversa" />
+                  <img src="/assets/images/tratamiento2.jpeg" alt="Sistema Portátil de Ósmosis Inversa" />
                 </div>
                 <div className="producto-info">
                   <h3>Sistema Portátil de Ósmosis Inversa</h3>
@@ -40,7 +40,7 @@ const ProductosPage = () => {
               
               <div className="producto-item">
                 <div className="producto-image">
-                  <img src="src/assets/images/tratamiento.jpeg" alt="Sistema Industrial de Tratamiento de Agua" />
+                  <img src="/assets/images/tratamiento.jpeg" alt="Sistema Industrial de Tratamiento de Agua" />
                 </div>
                 <div className="producto-info">
                   <h3>Sistema Industrial de Tratamiento de Agua</h3>

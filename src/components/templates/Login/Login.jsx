@@ -4,8 +4,7 @@ import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { AppContext } from '../../../context/AppContext';
 import './Login.css';
 
-// URL base de la API - definida directamente sin usar process.env
-const API_URL = 'http://34.232.185.39:8000'; // Cambia esto a la URL de tu API
+const API_URL = 'http://34.232.185.39:8000'; 
 
 const Login = () => {
   const [email, setEmail] = useState('');
