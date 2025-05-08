@@ -12,7 +12,7 @@ export const AppProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [isAdmin, setIsAdmin] = useState(false);
   const [loading, setLoading] = useState(true);
-  const [token, setToken] = useState(''); // Añadido estado para token
+  const [token, setToken] = useState(''); // Estado para token
 
   // Verificar autenticación al cargar
   useEffect(() => {
@@ -32,13 +32,13 @@ export const AppProvider = ({ children }) => {
         
         try {
           // Verificar si es un token mock para admin o usuario
-          if (storedToken.startsWith('admin_mock_token_') || storedToken.startsWith('user_mock_token_')) {
-            console.log("Token mock detectado, usando datos guardados");
+          if (storedToken.startsWith('admin_token_') || storedToken.startsWith('admin_mock_token_')) {
+            console.log("Token de admin detectado, usando datos guardados");
             if (savedUser) {
               const userData = JSON.parse(savedUser);
               setIsAuthenticated(true);
               setUser(userData);
-              setIsAdmin(userData.role === 'admin' || userData.email === 'admin@hotmail.com');
+              setIsAdmin(true);
               setLoading(false);
               return;
             }
@@ -62,7 +62,8 @@ export const AppProvider = ({ children }) => {
             const userDataFormatted = {
               ...userData,
               nombre_completo: userData.nombre_completo || userData.name || "Usuario",
-              name: userData.name || userData.nombre_completo || "Usuario"
+              name: userData.name || userData.nombre_completo || "Usuario",
+              token: storedToken // Incluir el token en el objeto usuario
             };
             
             // Determinar si es admin
@@ -107,12 +108,13 @@ export const AppProvider = ({ children }) => {
           const userData = JSON.parse(savedUser);
           console.log("Usando datos de usuario guardados en localStorage:", userData);
           
-          // Generar un nuevo token mock
-          const newMockToken = userData.email === 'admin@hotmail.com' ? 
-            `admin_mock_token_${Date.now()}` : 
-            `user_mock_token_${Date.now()}`;
+          // Determinar qué tipo de token mock generar
+          const isAdminUser = userData.role === 'admin' || userData.email === 'admin@hotmail.com';
+          const newMockToken = isAdminUser 
+            ? `admin_token_${Date.now()}` 
+            : `user_token_${Date.now()}`;
           
-          console.log("Generando nuevo token mock:", newMockToken);
+          console.log("Generando nuevo token:", newMockToken);
           localStorage.setItem('token', newMockToken);
           setToken(newMockToken);
           
@@ -120,20 +122,19 @@ export const AppProvider = ({ children }) => {
           const userDataFormatted = {
             ...userData,
             nombre_completo: userData.nombre_completo || userData.name || "Usuario",
-            name: userData.name || userData.nombre_completo || "Usuario"
+            name: userData.name || userData.nombre_completo || "Usuario",
+            token: newMockToken
           };
-          
-          // Determinar si es admin
-          const userIsAdmin = 
-            userDataFormatted.role === 'admin' || 
-            userDataFormatted.email === 'admin@hotmail.com';
           
           setIsAuthenticated(true);
           setUser(userDataFormatted);
-          setIsAdmin(userIsAdmin);
+          setIsAdmin(isAdminUser);
           
           console.log("Usuario cargado desde localStorage:", userDataFormatted);
-          console.log("Es admin:", userIsAdmin);
+          console.log("Es admin:", isAdminUser);
+          
+          // Actualizar localStorage con el token
+          localStorage.setItem('user', JSON.stringify(userDataFormatted));
         } catch (error) {
           console.error("Error al procesar datos de usuario guardados:", error);
           localStorage.removeItem('isAuthenticated');
@@ -161,17 +162,78 @@ export const AppProvider = ({ children }) => {
   // Función para iniciar sesión mediante la API
   const login = async (credentials) => {
     try {
-      // Si recibimos un objeto con datos de usuario en lugar de credenciales
-      if (credentials && credentials.email && 
-          ((credentials.nombre_completo || credentials.name) || credentials.role === 'admin')) {
+      // CASO ESPECIAL: Si llega un objeto con token ya incluido, usarlo directamente
+      if (credentials && credentials.token) {
+        console.log("Login con objeto que ya incluye token:", credentials);
         
-        console.log("Login con datos de usuario directos:", credentials);
+        const tokenValue = credentials.token;
         
-        // Es un objeto de usuario, no credenciales - usar loginLocal
-        loginLocal(credentials);
-        return { user: credentials };
+        // Asegurarse de que tengamos la estructura correcta
+        const userDataFormatted = {
+          ...credentials,
+          nombre_completo: credentials.nombre_completo || credentials.name || "Usuario",
+          name: credentials.name || credentials.nombre_completo || "Usuario"
+        };
+        
+        // Determinar si es admin
+        const userIsAdmin = 
+          userDataFormatted.role === 'admin' || 
+          userDataFormatted.email === 'admin@hotmail.com';
+        
+        // Guardar token en localStorage
+        localStorage.setItem('token', tokenValue);
+        localStorage.setItem('user', JSON.stringify(userDataFormatted));
+        localStorage.setItem('isAuthenticated', 'true');
+        
+        // Configurar el estado
+        setToken(tokenValue);
+        setIsAuthenticated(true);
+        setUser(userDataFormatted);
+        setIsAdmin(userIsAdmin);
+        
+        console.log("Autenticación directa completada:", {
+          isAuthenticated: true,
+          user: userDataFormatted,
+          isAdmin: userIsAdmin,
+          token: tokenValue
+        });
+        
+        return { user: userDataFormatted, token: tokenValue };
       }
       
+      // CASO ADMIN MOCK: Admin hardcodeado sin usar API
+      if (credentials && credentials.email === 'admin@hotmail.com' && credentials.password === 'admin123') {
+        console.log("Login como admin hardcodeado");
+        
+        // Crear usuario admin
+        const adminUser = {
+          id: 999, // ID ficticio para admin
+          nombre_completo: 'Administrador',
+          name: 'Administrador',
+          email: 'admin@hotmail.com',
+          role: 'admin',
+        };
+        
+        // Generar token mock para admin
+        const adminToken = `admin_token_${Date.now()}`;
+        
+        // Guardar en localStorage
+        localStorage.setItem('token', adminToken);
+        localStorage.setItem('user', JSON.stringify({...adminUser, token: adminToken}));
+        localStorage.setItem('isAuthenticated', 'true');
+        
+        // Actualizar estado
+        setToken(adminToken);
+        setIsAuthenticated(true);
+        setUser({...adminUser, token: adminToken});
+        setIsAdmin(true);
+        
+        console.log("Login admin completado con token:", adminToken);
+        
+        return { user: adminUser, token: adminToken };
+      }
+      
+      // CASO NORMAL: Llamada a la API con credenciales
       console.log("Enviando credenciales a la API:", credentials);
       
       const response = await fetch(`${API_URL}/api/auth/login`, {
@@ -211,13 +273,14 @@ export const AppProvider = ({ children }) => {
       const tokenValue = data.token.startsWith('Bearer ') ? 
         data.token.substring(7) : data.token;
       
-      console.log("Token extraído:", tokenValue);
+      console.log("Token JWT extraído:", tokenValue);
       
-      // Asegurarse de que tengamos la estructura correcta (compatibilidad nombre_completo/name)
+      // Asegurarse de que tengamos la estructura correcta
       const userDataFormatted = {
         ...data.user,
         nombre_completo: data.user.nombre_completo || data.user.name || "Usuario",
-        name: data.user.name || data.user.nombre_completo || "Usuario"
+        name: data.user.name || data.user.nombre_completo || "Usuario",
+        token: tokenValue // Incluir el token en los datos del usuario
       };
       
       // Determinar si es admin
@@ -243,7 +306,7 @@ export const AppProvider = ({ children }) => {
         token: tokenValue
       });
       
-      return data;
+      return { user: userDataFormatted, token: tokenValue };
     } catch (error) {
       console.error("Error en login:", error);
       throw error;
@@ -273,17 +336,17 @@ export const AppProvider = ({ children }) => {
       };
       
       // Generar token mock para admin
-      const adminMockToken = `admin_mock_token_${Date.now()}`;
+      const adminMockToken = `admin_token_${Date.now()}`;
       localStorage.setItem('token', adminMockToken);
       console.log("Token mock para admin guardado:", adminMockToken);
       
       localStorage.setItem('isAuthenticated', 'true');
-      localStorage.setItem('user', JSON.stringify(admin));
+      localStorage.setItem('user', JSON.stringify({...admin, token: adminMockToken}));
       
       // Establecer explícitamente como admin
       setToken(adminMockToken);
       setIsAuthenticated(true);
-      setUser(admin);
+      setUser({...admin, token: adminMockToken});
       setIsAdmin(true);
       
       console.log("Estado actualizado - isAdmin:", true);
@@ -296,24 +359,24 @@ export const AppProvider = ({ children }) => {
         role: userData.role || 'user'
       };
       
-      // Generar token mock para usuario normal
-      const userMockToken = `user_mock_token_${Date.now()}`;
-      localStorage.setItem('token', userMockToken);
-      console.log("Token mock para usuario guardado:", userMockToken);
+      // Usar token existente o generar uno nuevo
+      const userToken = userData.token || `user_token_${Date.now()}`;
+      localStorage.setItem('token', userToken);
+      console.log("Token para usuario guardado:", userToken);
       
       localStorage.setItem('isAuthenticated', 'true');
-      localStorage.setItem('user', JSON.stringify(userFormatted));
+      localStorage.setItem('user', JSON.stringify({...userFormatted, token: userToken}));
       
-      setToken(userMockToken);
+      setToken(userToken);
       setIsAuthenticated(true);
-      setUser(userFormatted);
+      setUser({...userFormatted, token: userToken});
       setIsAdmin(false);
       
       console.log("Estado actualizado - usuario normal:", {
         isAuthenticated: true,
         user: userFormatted,
         isAdmin: false,
-        token: userMockToken
+        token: userToken
       });
     }
   };
@@ -334,7 +397,7 @@ export const AppProvider = ({ children }) => {
     console.log("Sesión cerrada correctamente");
   };
   
-  // Nueva función para realizar peticiones autenticadas
+  // Función para realizar peticiones autenticadas a la API
   const authFetch = async (url, options = {}) => {
     try {
       // Obtener token actualizado del estado o localStorage
@@ -364,26 +427,31 @@ export const AppProvider = ({ children }) => {
       // Si la respuesta es 401 (Unauthorized), manejar la sesión expirada
       if (response.status === 401) {
         console.error('Error de autenticación en la petición a la API');
+        const responseText = await response.text();
+        console.error(`Respuesta de error: ${responseText}`);
         
-        // Si estamos en modo desarrollo o es un token mock, podemos intentar generar uno nuevo
-        if (currentToken.includes('mock') || process.env.NODE_ENV === 'development') {
+        // Si es un token mock, podemos intentar generar uno nuevo
+        if (currentToken.includes('token_') && user) {
           console.log("Intentando regenerar token mock...");
           
-          if (user) {
-            const newMockToken = user.email === 'admin@hotmail.com' ? 
-              `admin_mock_token_${Date.now()}` : 
-              `user_mock_token_${Date.now()}`;
-              
-            console.log("Nuevo token mock generado:", newMockToken);
-            localStorage.setItem('token', newMockToken);
-            setToken(newMockToken);
+          const newMockToken = user.email === 'admin@hotmail.com' ? 
+            `admin_token_${Date.now()}` : 
+            `user_token_${Date.now()}`;
             
-            // Reintentar la petición con el nuevo token
-            return authFetch(url, options);
-          }
+          console.log("Nuevo token mock generado:", newMockToken);
+          localStorage.setItem('token', newMockToken);
+          setToken(newMockToken);
+          
+          // Actualizar el usuario con el nuevo token
+          const updatedUser = {...user, token: newMockToken};
+          localStorage.setItem('user', JSON.stringify(updatedUser));
+          setUser(updatedUser);
+          
+          // Reintentar la petición con el nuevo token
+          return authFetch(url, options);
         }
         
-        // Sino, cerramos sesión (token inválido o expirado)
+        // Si no es un token mock o no se puede regenerar, cerrar sesión
         logout();
         throw new Error('Sesión expirada, por favor inicie sesión nuevamente');
       }
@@ -407,7 +475,10 @@ export const AppProvider = ({ children }) => {
     loginLocal,
     logout,
     authFetch, // Exponemos la función authFetch
-    setToken // Exponemos setToken para componentes que necesiten actualizar el token
+    setToken, // Exponemos setToken para componentes que necesiten actualizar el token
+    setUser,
+    setIsAuthenticated,
+    setIsAdmin
   };
   
   return (

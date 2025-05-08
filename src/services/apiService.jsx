@@ -1,20 +1,57 @@
-// src/services/apiService.js
+// src/services/apiService.js - Versión corregida
+
 import { useContext } from 'react';
 import { AppContext } from '../context/AppContext';
 
-// Define la URL base de la API - Asegúrate de que sea la misma que en AppContext.jsx
-const API_URL = 'https://www.isomed.com.mx';
+// Define la URL base de la API
+const API_URL = 'https://www.isomed.com.mx/api';
 
 // Hook personalizado para usar el servicio de API
 export const useApiService = () => {
-  const { 
-    authFetch, 
-    token, 
-    isAuthenticated, 
-    user,
-    isAdmin
-  } = useContext(AppContext);
-  
+  const { authFetch, token, isAuthenticated, user, isAdmin } = useContext(AppContext);
+
+  // Función centralizada para realizar peticiones autenticadas
+  const fetchWithAuth = async (url, options = {}) => {
+    try {
+      // Obtener el token actual, ya sea del contexto o de localStorage
+      const currentToken = token || localStorage.getItem('token');
+      
+      if (!currentToken) {
+        console.error('No hay token disponible para autenticar la petición');
+        throw new Error('No hay sesión activa');
+      }
+      
+      // Definir las cabeceras con el token de autenticación
+      const headers = {
+        ...options.headers,
+        'Authorization': `Bearer ${currentToken}`,
+        'Content-Type': options.headers?.['Content-Type'] || 'application/json'
+      };
+      
+      // Realizar la petición
+      console.log(`Realizando petición a: ${url}`);
+      console.log(`Token utilizado: ${currentToken}`);
+      
+      const response = await fetch(url, {
+        ...options,
+        headers
+      });
+      
+      // Si la respuesta es 401, podría ser un token expirado
+      if (response.status === 401) {
+        console.error('Error de autenticación en la petición a la API');
+        const errorText = await response.text();
+        console.error(`Respuesta de error: ${errorText}`);
+        throw new Error('Sesión expirada o token inválido');
+      }
+      
+      return response;
+    } catch (error) {
+      console.error('Error en fetchWithAuth:', error);
+      throw error;
+    }
+  };
+
   // Función para obtener órdenes de un cliente
   const getClientOrders = async (clientId) => {
     try {
@@ -23,7 +60,7 @@ export const useApiService = () => {
       
       if (!effectiveClientId && !isAdmin) {
         console.error('No hay ID de cliente disponible y no es administrador');
-        return []; // Devolver arreglo vacío en lugar de error
+        return getMockClientOrders(clientId); // Devolver datos mock en lugar de error
       }
       
       // Si es admin y no se especifica cliente, puede ver todas las órdenes
@@ -34,26 +71,15 @@ export const useApiService = () => {
       
       console.log(`Obteniendo órdenes para el cliente ID: ${effectiveClientId}`);
       
-      // Comprobar autenticación
-      if (!isAuthenticated || !token) {
-        console.log('Token no disponible en contexto, intentando recuperar de localStorage');
-        const storedToken = localStorage.getItem('token');
-        
-        if (!storedToken) {
-          console.error('No hay token disponible para autenticar la petición');
-          return getMockClientOrders(effectiveClientId); // Retornar datos de ejemplo
-        }
-      }
-      
-      // Realizar la petición autenticada
-      const response = await authFetch(`${API_URL}/api/ordenes/cliente/${effectiveClientId}`);
+      // Realizar la petición autenticada usando nuestra función centralizada
+      const response = await fetchWithAuth(`${API_URL}/api/ordenes/cliente/${effectiveClientId}`);
       
       if (!response.ok) {
         const errorText = await response.text();
         console.error(`Error en respuesta: ${errorText}`);
         
-        // Si hay error, devolver datos de ejemplo para desarrollo/pruebas
-        console.log('API no disponible, usando datos de ejemplo');
+        // Si hay error, devolver datos mock para facilitar desarrollo/pruebas
+        console.log('API no disponible, usando datos mock');
         return getMockClientOrders(effectiveClientId);
       }
       
@@ -62,7 +88,7 @@ export const useApiService = () => {
       return data;
     } catch (error) {
       console.error('Error al obtener órdenes del cliente:', error);
-      // Proporcionar datos de ejemplo si hay error
+      // Proporcionar datos mock si hay error
       return getMockClientOrders(clientId);
     }
   };
@@ -72,26 +98,15 @@ export const useApiService = () => {
     try {
       console.log('Obteniendo todas las órdenes (admin)');
       
-      // Comprobar autenticación
-      if (!isAuthenticated || !token) {
-        console.log('Token no disponible en contexto, intentando recuperar de localStorage');
-        const storedToken = localStorage.getItem('token');
-        
-        if (!storedToken) {
-          console.error('No hay token disponible para autenticar la petición');
-          return getMockAllOrders(); // Retornar datos de ejemplo
-        }
-      }
-      
       // Realizar la petición autenticada
-      const response = await authFetch(`${API_URL}/api/ordenes`);
+      const response = await fetchWithAuth(`${API_URL}/api/ordenes`);
       
       if (!response.ok) {
         const errorText = await response.text();
         console.error(`Error en respuesta: ${errorText}`);
         
-        // Si hay error, devolver datos de ejemplo para desarrollo/pruebas
-        console.log('API no disponible, usando datos de ejemplo');
+        // Si hay error, devolver datos mock para desarrollo/pruebas
+        console.log('API no disponible, usando datos mock');
         return getMockAllOrders();
       }
       
@@ -100,7 +115,7 @@ export const useApiService = () => {
       return data;
     } catch (error) {
       console.error('Error al obtener todas las órdenes:', error);
-      // Proporcionar datos de ejemplo si hay error
+      // Proporcionar datos mock si hay error
       return getMockAllOrders();
     }
   };
@@ -110,19 +125,8 @@ export const useApiService = () => {
     try {
       console.log('Enviando datos de orden:', orderData);
       
-      // Comprobar autenticación
-      if (!isAuthenticated || !token) {
-        console.log('Token no disponible en contexto, intentando recuperar de localStorage');
-        const storedToken = localStorage.getItem('token');
-        
-        if (!storedToken) {
-          console.error('No hay token disponible para autenticar la petición');
-          throw new Error('No hay sesión activa');
-        }
-      }
-      
       // Realizar la petición autenticada
-      const response = await authFetch(`${API_URL}/api/ordenes`, {
+      const response = await fetchWithAuth(`${API_URL}/api/ordenes`, {
         method: 'POST',
         body: JSON.stringify(orderData)
       });
@@ -137,7 +141,7 @@ export const useApiService = () => {
           return getMockCreatedOrder(orderData);
         }
         
-        throw new Error('Error al crear la orden');
+        throw new Error(`Error al crear la orden: ${response.status} ${errorText}`);
       }
       
       const data = await response.json();
@@ -154,25 +158,14 @@ export const useApiService = () => {
       throw error;
     }
   };
-  
-  // Función para actualizar una orden existente
+  // Continuación de la función updateOrder y resto del archivo
+
   const updateOrder = async (orderId, orderData) => {
     try {
       console.log(`Actualizando orden ${orderId} con datos:`, orderData);
       
-      // Comprobar autenticación
-      if (!isAuthenticated || !token) {
-        console.log('Token no disponible en contexto, intentando recuperar de localStorage');
-        const storedToken = localStorage.getItem('token');
-        
-        if (!storedToken) {
-          console.error('No hay token disponible para autenticar la petición');
-          throw new Error('No hay sesión activa');
-        }
-      }
-      
       // Realizar la petición autenticada
-      const response = await authFetch(`${API_URL}/api/ordenes/${orderId}`, {
+      const response = await fetchWithAuth(`${API_URL}/api/ordenes/${orderId}`, {
         method: 'PUT',
         body: JSON.stringify(orderData)
       });
@@ -187,7 +180,7 @@ export const useApiService = () => {
           return { id: orderId, ...orderData };
         }
         
-        throw new Error('Error al actualizar la orden');
+        throw new Error(`Error al actualizar la orden: ${response.status} ${errorText}`);
       }
       
       const data = await response.json();
@@ -217,7 +210,9 @@ export const useApiService = () => {
           {
             id_producto: 1,
             cantidad: 2,
-            precio_unitario: 100.0
+            precio_unitario: 100.0,
+            tipo: "SERVICIO",
+            descripcion: "Mantenimiento preventivo a tratamiento de osmosis inversa"
           }
         ]
       },
@@ -230,7 +225,9 @@ export const useApiService = () => {
           {
             id_producto: 2,
             cantidad: 1,
-            precio_unitario: 150.0
+            precio_unitario: 150.0,
+            tipo: "INSUMO",
+            descripcion: "Filtro de carbón activado"
           }
         ]
       }
@@ -258,6 +255,8 @@ export const useApiService = () => {
     getClientOrders,
     getAllOrders,
     createOrder,
-    updateOrder
+    updateOrder,
+    // Exportar fetchWithAuth para permitir su uso directo desde componentes
+    fetchWithAuth
   };
 };

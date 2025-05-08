@@ -20,42 +20,9 @@ const Login = () => {
   // Verificar si hay un mensaje de registro exitoso
   useEffect(() => {
     if (location.state && location.state.message) {
-      // Mostrar mensaje de éxito
       console.log("Mensaje del estado:", location.state.message);
     }
   }, [location]);
-
-  // Función para pruebas desde la consola
-  window.testLogin = async (testEmail, testPassword) => {
-    try {
-      const response = await fetch(`${API_URL}/api/auth/login`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ 
-          email: testEmail || 'test@example.com', 
-          password: testPassword || 'password123' 
-        }),
-      });
-      
-      console.log('Status:', response.status);
-      const text = await response.text();
-      console.log('Response text:', text);
-      
-      try {
-        const json = JSON.parse(text);
-        console.log('Parsed JSON:', json);
-        return json;
-      } catch (e) {
-        console.error('Error parsing JSON:', e);
-        return { text };
-      }
-    } catch (e) {
-      console.error('Fetch error:', e);
-      return { error: e.message };
-    }
-  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -68,13 +35,13 @@ const Login = () => {
       console.log("Iniciando sesión como administrador");
       const adminUser = {
         email,
-        password,
         nombre_completo: 'Administrador',
-        role: 'admin'  // Importante: añadir explícitamente el role admin
+        role: 'admin',
+        token: `admin_token_${Date.now()}` // Generar un token único para admin
       };
       
       // Guardar datos en localStorage
-      localStorage.setItem('token', 'admin-token');
+      localStorage.setItem('token', adminUser.token);
       localStorage.setItem('user', JSON.stringify(adminUser));
       localStorage.setItem('isAuthenticated', 'true');
       
@@ -82,9 +49,11 @@ const Login = () => {
       if (setIsAuthenticated) setIsAuthenticated(true);
       if (setUser) setUser(adminUser);
       if (setIsAdmin) setIsAdmin(true);
-      if (setToken) setToken('admin-token');
+      if (setToken) setToken(adminUser.token);
       
-      login(adminUser);
+      // No llames a login() aquí, ya que generará un token mock
+      // En lugar de eso, navega directamente
+      console.log('Login de admin exitoso, redirigiendo...');
       navigate('/');
       return;
     }
@@ -140,27 +109,32 @@ const Login = () => {
         throw new Error('Respuesta del servidor incompleta');
       }
       
-      // Preparar los datos del usuario
-      const userData = data.user;
+      // Preparar el token JWT (eliminar prefijo Bearer si existe)
+      const jwtToken = data.token.startsWith('Bearer ') ? data.token.substring(7) : data.token;
+      console.log('Token JWT extraído:', jwtToken);
+      
+      // Preparar los datos del usuario e incluir el token
+      const userData = {
+        ...data.user,
+        token: jwtToken // Incluir el token JWT real en el objeto usuario
+      };
+      
+      // Determinar si es admin
       const userIsAdmin = userData.role === 'admin';
       
       // Guardar token y datos del usuario en localStorage
-      localStorage.setItem('token', data.token);
+      localStorage.setItem('token', jwtToken);
       localStorage.setItem('user', JSON.stringify(userData));
       localStorage.setItem('isAuthenticated', 'true');
       
-      // Actualizar el contexto si las funciones están disponibles
-      if (setIsAuthenticated) setIsAuthenticated(true);
-      if (setUser) setUser(userData);
-      if (setIsAdmin) setIsAdmin(userIsAdmin);
-      if (setToken) setToken(data.token);
-      
-      // Usar la función de login del contexto con el objeto completo
-      login(userData);
+      // Actualizar el contexto directamente, sin llamar a login()
+      console.log('Actualizando estado directamente con token JWT real');
+      setToken(jwtToken);
+      setIsAuthenticated(true);
+      setUser(userData);
+      setIsAdmin(userIsAdmin);
       
       console.log('Login exitoso, redirigiendo...');
-      
-      // Redirigir al dashboard/inicio
       navigate('/');
     } catch (error) {
       console.error('Error completo en el login:', error);
@@ -170,7 +144,6 @@ const Login = () => {
       } else {
         setError(error.message || 'Error al iniciar sesión');
       }
-    } finally {
       setLoading(false);
     }
   };
