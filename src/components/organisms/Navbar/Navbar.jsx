@@ -115,7 +115,7 @@ const Navbar = () => {
                   <>
                     <NavLink to="/pedidos-admin" className="dropdown-item">Gestión de Pedidos</NavLink>
                     <NavLink to="/admin/usuarios" className="dropdown-item">Gestión de Usuarios</NavLink>
-
+                    <NavLink to="/admin/productos" className="dropdown-item">Gestión de Productos</NavLink>
                   </>
                 ) : (
                   // Menú para usuarios normales
