@@ -10,8 +10,9 @@ import Login from "./pages/Login";
 import Register from "./pages/Register";
 import PedidosAdmin from "./pages/PedidosAdmin"; 
 import SolicitarPedido from "./pages/SolicitarPedido"; 
-import AdminUsuarios from "./pages/AdminUsuarios"; // Importar la página de administración de usuarios
-import AdminProductos from "./pages/AdminProductos"; // Importar la nueva página de productos
+import AdminUsuarios from "./pages/AdminUsuarios"; 
+import AdminProductos from "./pages/AdminProductos"; 
+import OrdenesTrabajoUsuario from "./pages/OrdenesTrabajoUsuario"; // Importar nueva página
 import { AppContext } from "./context/AppContext";
 
 // Componente para rutas protegidas
@@ -75,6 +76,16 @@ const AppRoutes = () => {
         element={
           <ProtectedRoute>
             <SolicitarPedido />
+          </ProtectedRoute>
+        } 
+      />
+      
+      {/* Nueva ruta para órdenes de trabajo de usuarios */}
+      <Route 
+        path="/ordenes-trabajo" 
+        element={
+          <ProtectedRoute>
+            <OrdenesTrabajoUsuario />
           </ProtectedRoute>
         } 
       />

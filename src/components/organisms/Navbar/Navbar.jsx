@@ -120,7 +120,7 @@ const Navbar = () => {
                 ) : (
                   // Menú para usuarios normales
                   <>
-                  
+                    <NavLink to="/ordenes-trabajo" className="dropdown-item">Órdenes de Trabajo</NavLink>
                   </>
                 )}
                 <button onClick={handleLogout} className="dropdown-item logout">
