@@ -257,8 +257,14 @@ const AdminProductos = () => {
       });
       
       if (!response.ok && response.status !== 204) { // 204 No Content es un estado válido para DELETE
-        const errorData = await response.json().catch(() => ({}));
-        throw new Error(errorData.detail || `Error al eliminar producto: ${response.status}`);
+        if (response.status === 400) {
+          // Es un error conocido, probablemente relacionado con dependencias
+          const errorData = await response.json();
+          throw new Error(errorData.detail || "No se puede eliminar este producto porque está siendo utilizado en el sistema");
+        } else {
+          const errorData = await response.json().catch(() => ({}));
+          throw new Error(errorData.detail || `Error al eliminar producto: ${response.status}`);
+        }
       }
       
       console.log("Producto eliminado correctamente");
