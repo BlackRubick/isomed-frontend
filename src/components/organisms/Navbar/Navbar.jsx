@@ -74,7 +74,7 @@ const Navbar = () => {
         <NavItem link="/nosotros" text="Nosotros" />
         <NavItem link="/contacto" text="Contacto" />
         {isAuthenticated && userIsAdmin && (
-          <NavItem link="/pedidos-admin" text="Ver Pedidos" />
+          <></>
         )}
         {isAuthenticated && !userIsAdmin && (
           <NavItem link="/solicitar-pedido" text="Solicitar Pedido" />
@@ -113,9 +113,7 @@ const Navbar = () => {
                 {userIsAdmin ? (
                   // Menú para admin
                   <>
-                    <NavLink to="/panel-admin" className="dropdown-item">Panel de Admin</NavLink>
                     <NavLink to="/pedidos-admin" className="dropdown-item">Gestión de Pedidos</NavLink>
-                    <NavLink to="/usuarios" className="dropdown-item">Usuarios</NavLink>
                     <NavLink to="/admin/usuarios" className="dropdown-item">Gestión de Usuarios</NavLink>
 
                   </>
