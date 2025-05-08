@@ -1,5 +1,5 @@
 // src/components/organisms/Navbar/Navbar.jsx
-import React, { useState, useContext } from 'react';
+import React, { useState, useContext, useEffect } from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
 import NavItem from '../../molecules/NavItem/NavItem';
 import { AppContext } from '../../../context/AppContext';
@@ -11,6 +11,16 @@ const Navbar = () => {
   const { isAuthenticated, user, isAdmin, logout } = useContext(AppContext);
   
   const navigate = useNavigate();
+
+  // Log para debugging del usuario actual
+  useEffect(() => {
+    if (user) {
+      console.log("Navbar - Usuario actual:", user);
+      console.log("Navbar - Campos disponibles:", Object.keys(user));
+      console.log("Navbar - ¿Tiene nombre_completo?", user.hasOwnProperty('nombre_completo'));
+      console.log("Navbar - ¿Tiene name?", user.hasOwnProperty('name'));
+    }
+  }, [user]);
 
   const toggleMenu = () => {
     setIsOpen(!isOpen);
@@ -27,7 +37,22 @@ const Navbar = () => {
 
   // Determinar el nombre a mostrar - compatible con ambas estructuras
   const displayName = user?.nombre_completo || user?.name || 'Usuario';
-  const userInitial = (user?.nombre_completo || user?.name || 'U').charAt(0);
+  const userInitial = displayName.charAt(0).toUpperCase();
+
+  // Cerrar menú de usuario al hacer clic fuera de él
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      const userMenuContainer = document.querySelector('.user-menu-container');
+      if (userMenuContainer && !userMenuContainer.contains(event.target) && showUserMenu) {
+        setShowUserMenu(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [showUserMenu]);
 
   return (
     <nav className="navbar">
@@ -50,7 +75,7 @@ const Navbar = () => {
       </ul>
       
       <div className="auth-buttons">
-        {isAuthenticated ? (
+        {isAuthenticated && user ? (
           <div className="user-menu-container">
             <button className="user-button" onClick={toggleUserMenu}>
               <span className="user-initials">

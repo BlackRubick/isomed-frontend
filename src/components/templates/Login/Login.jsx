@@ -5,6 +5,7 @@ import { AppContext } from '../../../context/AppContext';
 import './Login.css';
 
 const API_URL = 'http://34.232.185.39:8000';
+
 const Login = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -24,6 +25,38 @@ const Login = () => {
     }
   }, [location]);
 
+  // Función para pruebas desde la consola
+  window.testLogin = async (testEmail, testPassword) => {
+    try {
+      const response = await fetch(`${API_URL}/api/auth/login`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ 
+          email: testEmail || 'test@example.com', 
+          password: testPassword || 'password123' 
+        }),
+      });
+      
+      console.log('Status:', response.status);
+      const text = await response.text();
+      console.log('Response text:', text);
+      
+      try {
+        const json = JSON.parse(text);
+        console.log('Parsed JSON:', json);
+        return json;
+      } catch (e) {
+        console.error('Error parsing JSON:', e);
+        return { text };
+      }
+    } catch (e) {
+      console.error('Fetch error:', e);
+      return { error: e.message };
+    }
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
@@ -35,7 +68,7 @@ const Login = () => {
       login({
         email,
         password,
-        name: 'Administrador'
+        nombre_completo: 'Administrador'  // Usar nombre_completo en lugar de name
       });
       navigate('/');
       return;
@@ -45,6 +78,14 @@ const Login = () => {
     console.log(`URL de la API: ${API_URL}/api/auth/login`);
     
     try {
+      // Crear objeto con los datos exactos que espera la API
+      const loginData = {
+        email: email,
+        password: password
+      };
+      
+      console.log('Datos enviados:', loginData);
+      
       // Llamada a la API para autenticación
       const response = await fetch(`${API_URL}/api/auth/login`, {
         method: 'POST',
@@ -52,12 +93,12 @@ const Login = () => {
           'Content-Type': 'application/json',
           'Accept': 'application/json'
         },
-        body: JSON.stringify({ email, password }),
+        body: JSON.stringify(loginData),
       });
       
       console.log(`Código de estado de la respuesta: ${response.status}`);
       
-      // Capturar la respuesta completa para depuración
+      // Obtener la respuesta como texto primero para depuración
       const responseText = await response.text();
       console.log(`Respuesta completa: ${responseText}`);
       
@@ -69,17 +110,29 @@ const Login = () => {
       } catch (e) {
         console.error("Error al parsear respuesta JSON:", e);
         setDebugInfo({ raw: responseText });
+        throw new Error("Error al procesar la respuesta del servidor");
       }
       
       if (!response.ok) {
         throw new Error(data?.detail || data?.message || 'Credenciales incorrectas');
       }
       
-      // Usar la función de login del contexto
-      login({
-        ...data.user,
-        email: email // Asegurarnos de que el email está en el objeto usuario
-      });
+      console.log('Datos de usuario recibidos:', data.user);
+      
+      // Verificar que el objeto user contiene los datos esperados
+      if (!data.user || !data.token) {
+        console.error('Respuesta incompleta de la API:', data);
+        throw new Error('Respuesta del servidor incompleta');
+      }
+      
+      // Guardar token en localStorage
+      localStorage.setItem('token', data.token);
+      
+      // Guardar datos del usuario
+      localStorage.setItem('user', JSON.stringify(data.user));
+      
+      // Usar la función de login del contexto con el objeto completo
+      login(data.user);
       
       console.log('Login exitoso, redirigiendo...');
       
@@ -98,7 +151,6 @@ const Login = () => {
     }
   };
 
-  // Resto del componente se mantiene igual
   return (
     <div className="login-container">
       <div className="login-card">
@@ -158,6 +210,7 @@ const Login = () => {
         
         <div className="login-footer">
           <p>¿No tienes una cuenta? <Link to="/register">Registrarse</Link></p>
+          <p><Link to="/forgot-password">¿Olvidaste tu contraseña?</Link></p>
         </div>
         
         {debugInfo && (
