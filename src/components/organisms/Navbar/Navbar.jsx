@@ -116,13 +116,13 @@ const Navbar = () => {
                     <NavLink to="/panel-admin" className="dropdown-item">Panel de Admin</NavLink>
                     <NavLink to="/pedidos-admin" className="dropdown-item">Gestión de Pedidos</NavLink>
                     <NavLink to="/usuarios" className="dropdown-item">Usuarios</NavLink>
+                    <NavLink to="/admin/usuarios" className="dropdown-item">Gestión de Usuarios</NavLink>
+
                   </>
                 ) : (
                   // Menú para usuarios normales
                   <>
-                    <NavLink to="/profile" className="dropdown-item">Mi Perfil</NavLink>
-                    <NavLink to="/mis-pedidos" className="dropdown-item">Mis Pedidos</NavLink>
-                    <NavLink to="/settings" className="dropdown-item">Configuración</NavLink>
+                  
                   </>
                 )}
                 <button onClick={handleLogout} className="dropdown-item logout">

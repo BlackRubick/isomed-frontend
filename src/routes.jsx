@@ -10,6 +10,7 @@ import Login from "./pages/Login";
 import Register from "./pages/Register";
 import PedidosAdmin from "./pages/PedidosAdmin"; 
 import SolicitarPedido from "./pages/SolicitarPedido"; 
+import AdminUsuarios from "./pages/AdminUsuarios"; // Importar la nueva página
 import { AppContext } from "./context/AppContext";
 
 // Componente para rutas protegidas
@@ -44,6 +45,16 @@ const AppRoutes = () => {
         element={
           <ProtectedRoute requiredRole="admin">
             <PedidosAdmin />
+          </ProtectedRoute>
+        } 
+      />
+      
+      {/* Nueva ruta para la administración de usuarios */}
+      <Route 
+        path="/admin/usuarios" 
+        element={
+          <ProtectedRoute requiredRole="admin">
+            <AdminUsuarios />
           </ProtectedRoute>
         } 
       />
