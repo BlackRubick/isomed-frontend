@@ -152,13 +152,30 @@
   border: 1px solid #c3e6cb;
 }
 
-.api-info {
-  background-color: #e2f0fd;
+.fixed-token-info {
+  background-color: #e9f5ff;
   color: #0c5460;
   padding: 12px 15px;
   border-radius: 4px;
   margin-bottom: 20px;
   border: 1px solid #bee5eb;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.fixed-token-info .badge {
+  background-color: #17a2b8;
+  color: white;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: bold;
+}
+
+.fixed-token-info p {
+  margin: 0;
+  font-size: 14px;
 }
 
 .no-data {
