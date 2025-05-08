@@ -6,7 +6,6 @@ import './Login.css';
 
 const API_URL = 'https://www.isomed.com.mx/api';
 
-
 const Login = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -16,7 +15,7 @@ const Login = () => {
   
   const navigate = useNavigate();
   const location = useLocation();
-  const { login } = useContext(AppContext);
+  const { login, setIsAuthenticated, setUser, setIsAdmin, setToken } = useContext(AppContext);
   
   // Verificar si hay un mensaje de registro exitoso
   useEffect(() => {
@@ -67,12 +66,25 @@ const Login = () => {
     // Verificar si es el usuario admin
     if (email === 'admin@hotmail.com' && password === 'admin123') {
       console.log("Iniciando sesión como administrador");
-      login({
+      const adminUser = {
         email,
         password,
         nombre_completo: 'Administrador',
         role: 'admin'  // Importante: añadir explícitamente el role admin
-      });
+      };
+      
+      // Guardar datos en localStorage
+      localStorage.setItem('token', 'admin-token');
+      localStorage.setItem('user', JSON.stringify(adminUser));
+      localStorage.setItem('isAuthenticated', 'true');
+      
+      // Actualizar el contexto
+      if (setIsAuthenticated) setIsAuthenticated(true);
+      if (setUser) setUser(adminUser);
+      if (setIsAdmin) setIsAdmin(true);
+      if (setToken) setToken('admin-token');
+      
+      login(adminUser);
       navigate('/');
       return;
     }
@@ -128,20 +140,23 @@ const Login = () => {
         throw new Error('Respuesta del servidor incompleta');
       }
       
-      // Guardar token en localStorage
+      // Preparar los datos del usuario
+      const userData = data.user;
+      const userIsAdmin = userData.role === 'admin';
+      
+      // Guardar token y datos del usuario en localStorage
       localStorage.setItem('token', data.token);
-      localStorage.setItem('token', data.token);
-      localStorage.setItem('user', JSON.stringify(userDataFormatted));
+      localStorage.setItem('user', JSON.stringify(userData));
       localStorage.setItem('isAuthenticated', 'true');
-      setIsAuthenticated(true);
-      setUser(userDataFormatted);
-      setIsAdmin(userIsAdmin);
-      setToken(data.token);
-      // Guardar datos del usuario
-      localStorage.setItem('user', JSON.stringify(data.user));
+      
+      // Actualizar el contexto si las funciones están disponibles
+      if (setIsAuthenticated) setIsAuthenticated(true);
+      if (setUser) setUser(userData);
+      if (setIsAdmin) setIsAdmin(userIsAdmin);
+      if (setToken) setToken(data.token);
       
       // Usar la función de login del contexto con el objeto completo
-      login(data.user);
+      login(userData);
       
       console.log('Login exitoso, redirigiendo...');
       
