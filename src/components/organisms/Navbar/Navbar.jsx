@@ -25,6 +25,10 @@ const Navbar = () => {
     navigate('/');
   };
 
+  // Determinar el nombre a mostrar - compatible con ambas estructuras
+  const displayName = user?.nombre_completo || user?.name || 'Usuario';
+  const userInitial = (user?.nombre_completo || user?.name || 'U').charAt(0);
+
   return (
     <nav className="navbar">
       <div className="mobile-menu-toggle" onClick={toggleMenu}>
@@ -50,10 +54,10 @@ const Navbar = () => {
           <div className="user-menu-container">
             <button className="user-button" onClick={toggleUserMenu}>
               <span className="user-initials">
-                {user?.name?.charAt(0) || 'U'}
+                {userInitial}
               </span>
               <span className="user-name">
-                {user?.name || 'Usuario'}
+                {displayName}
                 {isAdmin && ' (Admin)'}
               </span>
               <svg 

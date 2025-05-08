@@ -1,6 +1,9 @@
 // src/context/AppContext.jsx
 import React, { createContext, useState, useEffect } from "react";
 
+// Define la URL base de la API
+const API_URL = 'http://34.232.185.39:8000';
+
 export const AppContext = createContext();
 
 export const AppProvider = ({ children }) => {
@@ -8,58 +11,93 @@ export const AppProvider = ({ children }) => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [user, setUser] = useState(null);
   const [isAdmin, setIsAdmin] = useState(false);
+  const [loading, setLoading] = useState(true);
   
-  // Verificar autenticación al cargar y crear usuario admin si no existe
+  // Verificar autenticación al cargar
   useEffect(() => {
-    const checkAuth = () => {
-      const auth = localStorage.getItem('isAuthenticated');
-      const userData = localStorage.getItem('user');
+    const checkAuth = async () => {
+      setLoading(true);
+      const token = localStorage.getItem('token');
       
-      if (auth === 'true' && userData) {
-        const parsedUser = JSON.parse(userData);
-        setIsAuthenticated(true);
-        setUser(parsedUser);
-        setIsAdmin(parsedUser.email === 'admin@hotmail.com');
+      if (token) {
+        try {
+          // Intentar obtener datos del usuario desde la API usando el token
+          const response = await fetch(`${API_URL}/api/auth/me`, {
+            headers: {
+              'Authorization': `Bearer ${token}`
+            }
+          });
+          
+          if (response.ok) {
+            const userData = await response.json();
+            setIsAuthenticated(true);
+            setUser(userData);
+            setIsAdmin(userData.email === 'admin@hotmail.com'); // Puedes ajustar la lógica de admin
+          } else {
+            // Si la respuesta no es ok, limpiar token
+            localStorage.removeItem('token');
+            setIsAuthenticated(false);
+            setUser(null);
+            setIsAdmin(false);
+          }
+        } catch (error) {
+          console.error("Error al verificar autenticación:", error);
+          localStorage.removeItem('token');
+          setIsAuthenticated(false);
+          setUser(null);
+          setIsAdmin(false);
+        }
       } else {
         setIsAuthenticated(false);
         setUser(null);
         setIsAdmin(false);
       }
-    };
-    
-    // Verificar si ya existe el usuario admin
-    const adminUser = localStorage.getItem('adminUser');
-    if (!adminUser) {
-      // Crear usuario admin
-      const admin = {
-        name: 'Administrador',
-        email: 'admin@hotmail.com',
-        password: 'admin123', // En una app real, nunca almacenar contraseñas sin encriptar
-        role: 'admin'
-      };
       
-      localStorage.setItem('adminUser', JSON.stringify(admin));
-      console.log('Usuario administrador creado correctamente');
-    }
-    
-    // Verificar al montar el componente
-    checkAuth();
-    
-    // Escuchar evento de cambio de autenticación
-    window.addEventListener('auth-change', checkAuth);
-    
-    // Limpiar el listener al desmontar
-    return () => {
-      window.removeEventListener('auth-change', checkAuth);
+      setLoading(false);
     };
+    
+    checkAuth();
   }, []);
   
-  // Función para iniciar sesión
-  const login = (userData) => {
+  // Función para iniciar sesión mediante la API
+  const login = async (credentials) => {
+    try {
+      const response = await fetch(`${API_URL}/api/auth/login`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(credentials),
+      });
+      
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.detail || 'Error al iniciar sesión');
+      }
+      
+      const data = await response.json();
+      
+      // Guardar token en localStorage
+      localStorage.setItem('token', data.token);
+      
+      // Configurar el estado
+      setIsAuthenticated(true);
+      setUser(data.user);
+      setIsAdmin(data.user.email === 'admin@hotmail.com'); // Ajusta lógica para admin
+      
+      return data;
+    } catch (error) {
+      console.error("Error en login:", error);
+      throw error;
+    }
+  };
+  
+  // Mantener función de login anterior para compatibilidad (opcional)
+  const loginLocal = (userData) => {
     // Comprueba si es el admin
     if (userData.email === 'admin@hotmail.com' && userData.password === 'admin123') {
       const admin = {
-        name: 'Administrador',
+        nombre_completo: 'Administrador',  // Actualizado a nombre_completo
         email: 'admin@hotmail.com',
         role: 'admin'
       };
@@ -82,18 +120,16 @@ export const AppProvider = ({ children }) => {
       setUser(user);
       setIsAdmin(false);
     }
-    
-    window.dispatchEvent(new Event('auth-change'));
   };
   
   // Función para cerrar sesión
   const logout = () => {
+    localStorage.removeItem('token');
     localStorage.removeItem('isAuthenticated');
     localStorage.removeItem('user');
     setIsAuthenticated(false);
     setUser(null);
     setIsAdmin(false);
-    window.dispatchEvent(new Event('auth-change'));
   };
 
   return (
@@ -103,7 +139,9 @@ export const AppProvider = ({ children }) => {
       isAuthenticated, 
       user, 
       isAdmin,
+      loading,
       login, 
+      loginLocal, // Mantener función antigua como opción
       logout 
     }}>
       {children}
