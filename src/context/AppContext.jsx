@@ -2,7 +2,7 @@
 import React, { createContext, useState, useEffect } from "react";
 
 // Define la URL base de la API
-const API_URL = 'http://34.232.185.39:8000';
+const API_URL = '';
 
 export const AppContext = createContext();
 
