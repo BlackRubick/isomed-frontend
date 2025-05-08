@@ -10,9 +10,8 @@ const Register = () => {
     nombre_completo: '',
     email: '',
     password: '',
-    confirmPassword: '',
-    numero_cliente: '',
-    id_cliente: null  // Este campo podría ser opcional o seleccionable desde una lista
+    confirmPassword: ''
+    // Eliminados todos los campos opcionales
   });
   
   const [error, setError] = useState('');
@@ -47,7 +46,15 @@ const Register = () => {
     
     setLoading(true);
     
-    console.log('Enviando datos de registro:', JSON.stringify(formData));
+    // Crear objeto de datos para enviar a la API
+    const dataToSend = {
+      nombre_completo: formData.nombre_completo,
+      email: formData.email,
+      password: formData.password,
+      confirmPassword: formData.confirmPassword // La API necesita este campo para validar
+    };
+    
+    console.log('Enviando datos de registro:', JSON.stringify(dataToSend));
     
     try {
       const response = await fetch(`${API_URL}/api/auth/register`, {
@@ -56,7 +63,7 @@ const Register = () => {
           'Content-Type': 'application/json',
           'Accept': 'application/json' 
         },
-        body: JSON.stringify(formData),
+        body: JSON.stringify(dataToSend),
       });
       
       console.log('Código de estado HTTP:', response.status);
@@ -161,34 +168,6 @@ const Register = () => {
                 required
                 placeholder="Confirma tu contraseña"
               />
-            </div>
-          </div>
-          
-          <div className="form-row">
-            <div className="form-group">
-              <label htmlFor="numero_cliente">Número de Cliente</label>
-              <input
-                type="text"
-                id="numero_cliente"
-                name="numero_cliente"
-                value={formData.numero_cliente}
-                onChange={handleChange}
-                placeholder="Opcional: Ingresa tu número de cliente"
-              />
-            </div>
-            
-            {/* Opcional: Si quieres permitir seleccionar un cliente existente */}
-            <div className="form-group">
-              <label htmlFor="id_cliente">Cliente</label>
-              <input
-                type="number"
-                id="id_cliente"
-                name="id_cliente"
-                value={formData.id_cliente || ''}
-                onChange={handleChange}
-                placeholder="Opcional: ID del cliente"
-              />
-              {/* Alternativa: podría ser un select con opciones de clientes */}
             </div>
           </div>
           
