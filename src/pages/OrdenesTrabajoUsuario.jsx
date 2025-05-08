@@ -1,7 +1,10 @@
-// src/pages/OrdenesTrabajoUsuario.jsx - Versión final
+// src/pages/OrdenesTrabajoUsuario.jsx - Versión completa corregida
 import React, { useState, useEffect, useContext } from 'react';
 import { AppContext } from '../context/AppContext';
 import './OrdenesTrabajoUsuario.css';
+
+// Definir la URL base de la API - Este es el cambio principal
+const API_URL = 'https://www.isomed.com.mx/api';
 
 const OrdenesTrabajoUsuario = () => {
   // Datos de ejemplo para usar si la API falla
@@ -45,6 +48,11 @@ const OrdenesTrabajoUsuario = () => {
   });
   
   const { user, token } = useContext(AppContext);
+  
+  // Agregar useEffect para cargar datos cuando el componente se monta
+  useEffect(() => {
+    fetchOrdenes();
+  }, [user]); // Dependencia añadida para recargar cuando cambie el usuario
   
   const estados = [
     '1- PRECOTIZACION',
@@ -668,8 +676,8 @@ const OrdenesTrabajoUsuario = () => {
                   </div>
                 )}
                 
-{/* Fecha de actualización */}
-<div className="fecha-actualizacion">
+                {/* Fecha de actualización */}
+                <div className="fecha-actualizacion">
                   <label>Fecha de última actualización</label>
                   <input 
                     type="text" 
