@@ -4,7 +4,8 @@ import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { AppContext } from '../../../context/AppContext';
 import './Login.css';
 
-const API_URL = 'https://34.232.185.39:8000';
+const API_URL = 'https://www.isomed.com.mx/api';
+
 
 const Login = () => {
   const [email, setEmail] = useState('');

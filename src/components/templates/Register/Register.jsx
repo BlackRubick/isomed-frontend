@@ -3,7 +3,8 @@ import { Link, useNavigate } from 'react-router-dom';
 import './Register.css';
 
 // URL base de la API - definida directamente sin usar process.env
-const API_URL = 'https://34.232.185.39:8000';
+const API_URL = 'https://www.isomed.com.mx/api';
+
 
 const Register = () => {
   const [formData, setFormData] = useState({
