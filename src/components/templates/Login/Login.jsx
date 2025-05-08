@@ -65,10 +65,12 @@ const Login = () => {
     
     // Verificar si es el usuario admin
     if (email === 'admin@hotmail.com' && password === 'admin123') {
+      console.log("Iniciando sesión como administrador");
       login({
         email,
         password,
-        nombre_completo: 'Administrador'  // Usar nombre_completo en lugar de name
+        nombre_completo: 'Administrador',
+        role: 'admin'  // Importante: añadir explícitamente el role admin
       });
       navigate('/');
       return;

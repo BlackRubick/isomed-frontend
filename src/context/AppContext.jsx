@@ -47,9 +47,17 @@ export const AppProvider = ({ children }) => {
               name: userData.name || userData.nombre_completo || "Usuario"
             };
             
+            // Determinar si es admin
+            const userIsAdmin = 
+              userDataFormatted.role === 'admin' || 
+              userDataFormatted.email === 'admin@hotmail.com';
+            
             setIsAuthenticated(true);
             setUser(userDataFormatted);
-            setIsAdmin(userData.email === 'admin@hotmail.com'); // Ajustar según lógica de admin
+            setIsAdmin(userIsAdmin);
+            
+            console.log("Usuario cargado desde API:", userDataFormatted);
+            console.log("Es admin:", userIsAdmin);
             
             // Actualizar localStorage con datos frescos
             localStorage.setItem('user', JSON.stringify(userDataFormatted));
@@ -86,9 +94,17 @@ export const AppProvider = ({ children }) => {
             name: userData.name || userData.nombre_completo || "Usuario"
           };
           
+          // Determinar si es admin
+          const userIsAdmin = 
+            userDataFormatted.role === 'admin' || 
+            userDataFormatted.email === 'admin@hotmail.com';
+          
           setIsAuthenticated(true);
           setUser(userDataFormatted);
-          setIsAdmin(userData.email === 'admin@hotmail.com');
+          setIsAdmin(userIsAdmin);
+          
+          console.log("Usuario cargado desde localStorage:", userDataFormatted);
+          console.log("Es admin:", userIsAdmin);
         } catch (error) {
           console.error("Error al procesar datos de usuario guardados:", error);
           localStorage.removeItem('isAuthenticated');
@@ -116,8 +132,9 @@ export const AppProvider = ({ children }) => {
     try {
       // Si recibimos un objeto con datos de usuario en lugar de credenciales
       // (compatibilidad con el login local)
-      if (credentials && credentials.email && !credentials.password && 
-          (credentials.nombre_completo || credentials.name)) {
+      if (credentials && credentials.email && 
+          ((credentials.nombre_completo || credentials.name) || credentials.role === 'admin')) {
+        
         console.log("Login con datos de usuario directos:", credentials);
         
         // Es un objeto de usuario, no credenciales - usar loginLocal
@@ -167,6 +184,11 @@ export const AppProvider = ({ children }) => {
         name: data.user.name || data.user.nombre_completo || "Usuario"
       };
       
+      // Determinar si es admin
+      const userIsAdmin = 
+        userDataFormatted.role === 'admin' || 
+        userDataFormatted.email === 'admin@hotmail.com';
+      
       // Guardar token en localStorage
       localStorage.setItem('token', data.token);
       localStorage.setItem('user', JSON.stringify(userDataFormatted));
@@ -175,7 +197,13 @@ export const AppProvider = ({ children }) => {
       // Configurar el estado
       setIsAuthenticated(true);
       setUser(userDataFormatted);
-      setIsAdmin(userDataFormatted.email === 'admin@hotmail.com'); // Ajustar lógica para admin
+      setIsAdmin(userIsAdmin);
+      
+      console.log("Estado actualizado después de login API:", {
+        isAuthenticated: true,
+        user: userDataFormatted,
+        isAdmin: userIsAdmin
+      });
       
       return data;
     } catch (error) {
@@ -188,8 +216,14 @@ export const AppProvider = ({ children }) => {
   const loginLocal = (userData) => {
     console.log("Login local con:", userData);
     
-    // Comprueba si es el admin
-    if (userData.email === 'admin@hotmail.com' && (userData.password === 'admin123' || userData.role === 'admin')) {
+    // Verificación más clara para admin
+    const isAdminUser = 
+      userData.email === 'admin@hotmail.com' || 
+      userData.role === 'admin';
+    
+    if (isAdminUser) {
+      console.log("Detectado usuario admin");
+      
       const admin = {
         id: 0, // ID ficticio para admin
         nombre_completo: 'Administrador',
@@ -200,13 +234,15 @@ export const AppProvider = ({ children }) => {
         id_cliente: null
       };
       
-      console.log("Login como administrador:", admin);
-      
       localStorage.setItem('isAuthenticated', 'true');
       localStorage.setItem('user', JSON.stringify(admin));
+      
+      // Establecer explícitamente como admin
       setIsAuthenticated(true);
       setUser(admin);
       setIsAdmin(true);
+      
+      console.log("Estado actualizado - isAdmin:", true);
     } else {
       // Login de usuario normal
       const userFormatted = {
@@ -216,13 +252,17 @@ export const AppProvider = ({ children }) => {
         role: userData.role || 'user'
       };
       
-      console.log("Login como usuario normal:", userFormatted);
-      
       localStorage.setItem('isAuthenticated', 'true');
       localStorage.setItem('user', JSON.stringify(userFormatted));
       setIsAuthenticated(true);
       setUser(userFormatted);
       setIsAdmin(false);
+      
+      console.log("Estado actualizado - usuario normal:", {
+        isAuthenticated: true,
+        user: userFormatted,
+        isAdmin: false
+      });
     }
   };
   

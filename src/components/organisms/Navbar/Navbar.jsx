@@ -12,15 +12,17 @@ const Navbar = () => {
   
   const navigate = useNavigate();
 
-  // Log para debugging del usuario actual
+  // Log para debugging del usuario actual y estado de admin
   useEffect(() => {
     if (user) {
       console.log("Navbar - Usuario actual:", user);
-      console.log("Navbar - Campos disponibles:", Object.keys(user));
+      console.log("Navbar - Estado isAdmin:", isAdmin);
+      console.log("Navbar - Email:", user.email);
+      console.log("Navbar - Role:", user.role);
       console.log("Navbar - ¿Tiene nombre_completo?", user.hasOwnProperty('nombre_completo'));
       console.log("Navbar - ¿Tiene name?", user.hasOwnProperty('name'));
     }
-  }, [user]);
+  }, [user, isAdmin]);
 
   const toggleMenu = () => {
     setIsOpen(!isOpen);
@@ -35,6 +37,11 @@ const Navbar = () => {
     navigate('/');
   };
 
+  // Determinar si es admin de forma más robusta
+  const userIsAdmin = isAdmin || 
+                     (user && (user.role === 'admin' || 
+                             user.email === 'admin@hotmail.com'));
+  
   // Determinar el nombre a mostrar - compatible con ambas estructuras
   const displayName = user?.nombre_completo || user?.name || 'Usuario';
   const userInitial = displayName.charAt(0).toUpperCase();
@@ -66,10 +73,10 @@ const Navbar = () => {
         <NavItem link="/productos" text="Productos" />
         <NavItem link="/nosotros" text="Nosotros" />
         <NavItem link="/contacto" text="Contacto" />
-        {isAuthenticated && isAdmin && (
+        {isAuthenticated && userIsAdmin && (
           <NavItem link="/pedidos-admin" text="Ver Pedidos" />
         )}
-        {isAuthenticated && !isAdmin && (
+        {isAuthenticated && !userIsAdmin && (
           <NavItem link="/solicitar-pedido" text="Solicitar Pedido" />
         )}
       </ul>
@@ -83,7 +90,7 @@ const Navbar = () => {
               </span>
               <span className="user-name">
                 {displayName}
-                {isAdmin && ' (Admin)'}
+                {userIsAdmin && ' (Admin)'}
               </span>
               <svg 
                 className={`dropdown-icon ${showUserMenu ? 'active' : ''}`} 
@@ -103,7 +110,7 @@ const Navbar = () => {
             
             {showUserMenu && (
               <div className="user-dropdown">
-                {isAdmin ? (
+                {userIsAdmin ? (
                   // Menú para admin
                   <>
                     <NavLink to="/panel-admin" className="dropdown-item">Panel de Admin</NavLink>
@@ -113,6 +120,9 @@ const Navbar = () => {
                 ) : (
                   // Menú para usuarios normales
                   <>
+                    <NavLink to="/profile" className="dropdown-item">Mi Perfil</NavLink>
+                    <NavLink to="/mis-pedidos" className="dropdown-item">Mis Pedidos</NavLink>
+                    <NavLink to="/settings" className="dropdown-item">Configuración</NavLink>
                   </>
                 )}
                 <button onClick={handleLogout} className="dropdown-item logout">
