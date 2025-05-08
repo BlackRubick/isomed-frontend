@@ -3,21 +3,21 @@ import { Link, useNavigate } from 'react-router-dom';
 import './Register.css';
 
 // URL base de la API - definida directamente sin usar process.env
-const API_URL = 'http://34.232.185.39:8000'; // Cambia esto a la URL de tu API
+const API_URL = 'http://34.232.185.39:8000';
 
 const Register = () => {
   const [formData, setFormData] = useState({
-    name: '',
+    nombre_completo: '',
     email: '',
     password: '',
     confirmPassword: '',
-    hospital: '',
-    position: ''
+    numero_cliente: '',
+    id_cliente: null  // Este campo podría ser opcional o seleccionable desde una lista
   });
   
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
-  const [apiResponse, setApiResponse] = useState(null); // Para depuración
+  const [apiResponse, setApiResponse] = useState(null); 
   
   const navigate = useNavigate();
 
@@ -36,7 +36,7 @@ const Register = () => {
     
     // Validaciones básicas
     if (formData.password !== formData.confirmPassword) {
-      setError('Las contraseñas no coinciden');
+      setError('Las contraseñas no coinciden'); 
       return;
     }
     
@@ -110,12 +110,12 @@ const Register = () => {
         <form onSubmit={handleSubmit} className="register-form">
           <div className="form-row">
             <div className="form-group">
-              <label htmlFor="name">Nombre Completo</label>
+              <label htmlFor="nombre_completo">Nombre Completo</label>
               <input
                 type="text"
-                id="name"
-                name="name"
-                value={formData.name}
+                id="nombre_completo"
+                name="nombre_completo"
+                value={formData.nombre_completo}
                 onChange={handleChange}
                 required
                 placeholder="Ingresa tu nombre completo"
@@ -166,27 +166,29 @@ const Register = () => {
           
           <div className="form-row">
             <div className="form-group">
-              <label htmlFor="hospital">Hospital o Clínica</label>
+              <label htmlFor="numero_cliente">Número de Cliente</label>
               <input
                 type="text"
-                id="hospital"
-                name="hospital"
-                value={formData.hospital}
+                id="numero_cliente"
+                name="numero_cliente"
+                value={formData.numero_cliente}
                 onChange={handleChange}
-                placeholder="Opcional: Nombre de tu institución"
+                placeholder="Opcional: Ingresa tu número de cliente"
               />
             </div>
             
+            {/* Opcional: Si quieres permitir seleccionar un cliente existente */}
             <div className="form-group">
-              <label htmlFor="position">Cargo</label>
+              <label htmlFor="id_cliente">Cliente</label>
               <input
-                type="text"
-                id="position"
-                name="position"
-                value={formData.position}
+                type="number"
+                id="id_cliente"
+                name="id_cliente"
+                value={formData.id_cliente || ''}
                 onChange={handleChange}
-                placeholder="Opcional: Tu puesto o especialidad"
+                placeholder="Opcional: ID del cliente"
               />
+              {/* Alternativa: podría ser un select con opciones de clientes */}
             </div>
           </div>
           

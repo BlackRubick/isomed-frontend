@@ -4,8 +4,7 @@ import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { AppContext } from '../../../context/AppContext';
 import './Login.css';
 
-const API_URL = 'http://34.232.185.39:8000'; 
-
+const API_URL = 'http://34.232.185.39:8000';
 const Login = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
