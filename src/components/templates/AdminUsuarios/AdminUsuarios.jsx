@@ -4,7 +4,7 @@ import { AppContext } from '../../../context/AppContext';
 import './AdminUsuarios.css';
 
 // URL de la API
-const API_URL = 'http://34.232.185.39:8000';
+const API_URL = 'https://34.232.185.39:8000';
 
 // Token fijo para administrador (debe coincidir con el token configurado en el backend)
 const ADMIN_FIXED_TOKEN = "admin_fixed_token_12345";
