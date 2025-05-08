@@ -40,10 +40,10 @@ const AdminProductos = () => {
       setError(null);
       
       try {
-        console.log("Cargando productos...");
+        console.log("Cargando productos con token fijo...");
         
-        // Obtener productos con el token fijo de administrador
-        const response = await fetch(`${API_URL}/api/productos`, {
+        // Usar la ruta fixed para obtener productos
+        const response = await fetch(`${API_URL}/api/admin-fixed/productos`, {
           headers: {
             'Authorization': `Bearer ${ADMIN_FIXED_TOKEN}`
           }
@@ -113,8 +113,8 @@ const AdminProductos = () => {
         throw new Error('El precio debe ser mayor que cero');
       }
       
-      // Usar el token fijo para la actualización
-      const response = await fetch(`${API_URL}/api/productos/${productoId}`, {
+      // Usar la ruta fixed para actualizar producto
+      const response = await fetch(`${API_URL}/api/admin-fixed/productos/${productoId}`, {
         method: 'PUT',
         headers: {
           'Authorization': `Bearer ${ADMIN_FIXED_TOKEN}`,
@@ -179,8 +179,8 @@ const AdminProductos = () => {
       
       console.log("Agregando nuevo producto:", formData);
       
-      // Usar el token fijo para la creación
-      const response = await fetch(`${API_URL}/api/productos`, {
+      // Usar la ruta fixed para crear producto
+      const response = await fetch(`${API_URL}/api/admin-fixed/productos`, {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${ADMIN_FIXED_TOKEN}`,
@@ -242,8 +242,8 @@ const AdminProductos = () => {
       
       console.log("Eliminando producto:", productoId);
       
-      // Usar el token fijo para la eliminación
-      const response = await fetch(`${API_URL}/api/productos/${productoId}`, {
+      // Usar la ruta fixed para eliminar producto
+      const response = await fetch(`${API_URL}/api/admin-fixed/productos/${productoId}`, {
         method: 'DELETE',
         headers: {
           'Authorization': `Bearer ${ADMIN_FIXED_TOKEN}`
@@ -315,6 +315,11 @@ const AdminProductos = () => {
       
       {error && <div className="error-message">{error}</div>}
       {successMessage && <div className="success-message">{successMessage}</div>}
+      
+      <div className="fixed-token-info">
+        <span className="badge">Acceso Admin</span>
+        <p>Usando acceso administrador con token seguro</p>
+      </div>
       
       <div className="action-bar">
         <button className="add-button" onClick={handleShowAddForm}>
