@@ -1,10 +1,10 @@
-// src/pages/OrdenesTrabajoUsuario.jsx - Versión simplificada
+// src/pages/OrdenesTrabajoUsuario.jsx - Versión final
 import React, { useState, useEffect, useContext } from 'react';
 import { AppContext } from '../context/AppContext';
 import './OrdenesTrabajoUsuario.css';
 
 const OrdenesTrabajoUsuario = () => {
-  // Datos de ejemplo para usar automáticamente
+  // Datos de ejemplo para usar si la API falla
   const datosEjemplo = [
     {
       id: 1251,
@@ -13,7 +13,7 @@ const OrdenesTrabajoUsuario = () => {
       fecha_mov: new Date().toISOString(),
       lineas_producto: [
         { id_producto: 1, cantidad: 1, precio_unitario: 18500, tipo: 'SERVICIO', 
-          descripcion: 'MANTENIMIENTO PREVENTIVO A MAQUINA DE ANESTESIA LIMPIEZA Y DESINFECCION DE EQUIPO. CALIBRACION DE VAPORIZADOR, CAMBIO DE CIRCUITO PACIENTE, CAMBIO DE CALSODADA EN CANISTER, CALIBRACION DE SENSOR DE OXIGENO, LIMPIEZA CON SOLVENTE ELECTRICO A TARJETAS ELECTRONICAS Y LIMPIEZA CON AIRE COMPRIMIDO.' },
+          descripcion: 'MANTENIMIENTO PREVENTIVO A MAQUINA DE ANESTESIA LIMPIEZA Y DESINFECCION DE EQUIPO.' },
         { id_producto: 2, cantidad: 3, precio_unitario: 2300, tipo: 'SERVICIO',
           descripcion: 'MANTENIMIENTO PREVENTIVO DE TRATAMIENTO DE AGUA DESINFECCION DE OSMOSIS Y DEISNFECCION DE RED' }
       ]
@@ -75,7 +75,7 @@ const OrdenesTrabajoUsuario = () => {
         console.log("Buscando órdenes para cliente ID:", user.id_cliente);
         
         try {
-          // Intentar obtener datos reales
+          // Intentar obtener datos reales de la API
           const response = await fetch(`/api/ordenes/cliente/${user.id_cliente}`, {
             method: 'GET',
             headers: {
@@ -184,14 +184,89 @@ const OrdenesTrabajoUsuario = () => {
         return;
       }
       
-      // Simulación: crear nueva orden con los datos de ejemplo
+      // IMPORTANTE: Actualmente tu modelo de BD solo soporta una línea de producto
+      // por orden, por lo que solo enviaremos la primera línea
+      const primeraLinea = nuevaOrden.lineasProducto[0];
+      
+      // Formatear los datos según la estructura que espera la API
+      const datosOrden = {
+        id_cliente: user.id_cliente,
+        id_producto: 1, // Valor por defecto
+        status: nuevaOrden.estado,
+        lineas_producto: [
+          {
+            id_producto: 1, // ID genérico (deberías tener un catálogo real)
+            cantidad: parseInt(primeraLinea.cantidad),
+            precio_unitario: parseFloat(primeraLinea.precioUnitario)
+          }
+        ]
+      };
+      
+      console.log("Enviando datos de orden:", datosOrden);
+      
+      // Realizar la petición a la API
+      const response = await fetch('/api/ordenes', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(datosOrden)
+      });
+      
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.error("Error en respuesta:", errorText);
+        throw new Error(`Error al crear orden: ${response.status} ${errorText}`);
+      }
+      
+      const ordenCreada = await response.json();
+      console.log("Orden creada exitosamente:", ordenCreada);
+      
+      // Enriquecer la respuesta con los datos que tenemos (la API no devuelve descripción)
+      const ordenEnriquecida = {
+        ...ordenCreada,
+        lineas_producto: ordenCreada.lineas_producto.map((linea, index) => ({
+          ...linea,
+          tipo: nuevaOrden.lineasProducto[index]?.tipo || 'SERVICIO',
+          descripcion: nuevaOrden.lineasProducto[index]?.descripcion || ''
+        }))
+      };
+      
+      // Actualizar la lista de órdenes
+      setOrdenes([...ordenes, ordenEnriquecida]);
+      
+      // Resetear el formulario
+      setNuevaOrden({
+        folio: '',
+        idCliente: '',
+        estado: '1- PRECOTIZACION',
+        lineasProducto: [
+          { cantidad: 1, tipo: 'SERVICIO', descripcion: '', precioUnitario: 0 }
+        ],
+        observaciones: ''
+      });
+      
+      setModoEdicion(false);
+      setLoading(false);
+      
+      // Mostrar mensaje de éxito
+      alert('Orden de trabajo creada correctamente');
+      
+    } catch (error) {
+      console.error("Error al crear orden:", error);
+      
+      // Si hay un error, intentar el modo de datos de ejemplo como fallback
+      alert(`Error: ${error.message}. Usando modo de ejemplo como alternativa.`);
+      
+      // Simular creación con datos de ejemplo
       const nuevaOrdenEjemplo = {
-        id: Math.floor(Math.random() * 10000) + 100, // ID aleatorio
+        id: Math.floor(Math.random() * 10000) + 100,
         id_cliente: user?.id_cliente || 15,
         status: nuevaOrden.estado,
         fecha_mov: new Date().toISOString(),
         lineas_producto: nuevaOrden.lineasProducto.map(linea => ({
-          id_producto: Math.floor(Math.random() * 100) + 1, // ID aleatorio
+          id_producto: Math.floor(Math.random() * 100) + 1,
           cantidad: parseInt(linea.cantidad),
           precio_unitario: parseFloat(linea.precioUnitario),
           tipo: linea.tipo,
@@ -199,29 +274,21 @@ const OrdenesTrabajoUsuario = () => {
         }))
       };
       
-      // Actualizar la lista de órdenes con la nueva orden
+      // Actualizar la lista de órdenes con la simulación
       setOrdenes([...ordenes, nuevaOrdenEjemplo]);
       
-      // Simular una pequeña demora
-      setTimeout(() => {
-        // Resetear el formulario
-        setNuevaOrden({
-          folio: '',
-          idCliente: '',
-          estado: '1- PRECOTIZACION',
-          lineasProducto: [
-            { cantidad: 1, tipo: 'SERVICIO', descripcion: '', precioUnitario: 0 }
-          ],
-          observaciones: ''
-        });
-        
-        setModoEdicion(false);
-        setLoading(false);
-      }, 500);
+      // Resetear el formulario
+      setNuevaOrden({
+        folio: '',
+        idCliente: '',
+        estado: '1- PRECOTIZACION',
+        lineasProducto: [
+          { cantidad: 1, tipo: 'SERVICIO', descripcion: '', precioUnitario: 0 }
+        ],
+        observaciones: ''
+      });
       
-    } catch (error) {
-      console.error("Error al crear orden:", error);
-      alert("Error al crear la orden: " + error.message);
+      setModoEdicion(false);
       setLoading(false);
     }
   };
@@ -569,8 +636,8 @@ const OrdenesTrabajoUsuario = () => {
                   </div>
                 )}
                 
-                {/* Fecha de actualización */}
-                <div className="fecha-actualizacion">
+{/* Fecha de actualización */}
+<div className="fecha-actualizacion">
                   <label>Fecha de última actualización</label>
                   <input 
                     type="text" 
