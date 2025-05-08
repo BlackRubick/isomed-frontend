@@ -1,9 +1,9 @@
-// src/components/templates/AdminUsuarios/AdminUsuarios.jsx
 import React, { useState, useEffect, useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { AppContext } from '../../../context/AppContext';
 import './AdminUsuarios.css';
 
+// URL de la API
 const API_URL = 'http://34.232.185.39:8000';
 
 const AdminUsuarios = () => {
@@ -17,6 +17,7 @@ const AdminUsuarios = () => {
     numero_cliente: ''
   });
   const [successMessage, setSuccessMessage] = useState('');
+  const [confirmDelete, setConfirmDelete] = useState(null);
   
   const { isAuthenticated, isAdmin, user } = useContext(AppContext);
   const navigate = useNavigate();
@@ -37,43 +38,12 @@ const AdminUsuarios = () => {
       try {
         // Obtener token para autenticación
         const token = localStorage.getItem('token');
-        const userData = JSON.parse(localStorage.getItem('user') || '{}');
-        
-        console.log("Token disponible:", !!token); // Depuración
-        console.log("Usuario almacenado:", userData); // Depuración
-        
-        // Verificar si es admin por token mock o usuario almacenado
-        const isAdminToken = token && token.startsWith('admin_mock_token_');
-        const isAdminUser = userData && (userData.role === 'admin' || userData.email === 'admin@hotmail.com');
         
         if (!token) {
           throw new Error('No hay token de autenticación. Por favor inicia sesión nuevamente.');
         }
         
-        // Si es un token mock de admin o el usuario es admin, usar datos simulados
-        if (isAdminToken || isAdminUser) {
-          console.log("Usando datos simulados para admin");
-          
-          // Datos simulados para desarrollo
-          const mockUsuarios = [
-            { id: 1, nombre_completo: 'Juan Pérez', email: 'juan@example.com', numero_cliente: '001', id_cliente: null },
-            { id: 2, nombre_completo: 'María García', email: 'maria@example.com', numero_cliente: '002', id_cliente: 1 },
-            { id: 3, nombre_completo: 'Carlos López', email: 'carlos@example.com', numero_cliente: '', id_cliente: null },
-          ];
-          
-          const mockClientes = [
-            { id: 1, nombre: 'Empresa A' },
-            { id: 2, nombre: 'Empresa B' },
-            { id: 3, nombre: 'Empresa C' },
-          ];
-          
-          setUsuarios(mockUsuarios);
-          setClientes(mockClientes);
-          setLoading(false);
-          return; // Detener ejecución, no intentar llamar a la API
-        }
-        
-        // Si llegamos aquí, es un token real y podemos intentar llamar a la API
+        // Cargar usuarios desde la API
         const usuariosResponse = await fetch(`${API_URL}/api/admin/usuarios`, {
           headers: {
             'Authorization': `Bearer ${token}`
@@ -81,7 +51,7 @@ const AdminUsuarios = () => {
         });
         
         if (!usuariosResponse.ok) {
-          throw new Error('Error al cargar usuarios');
+          throw new Error(`Error al cargar usuarios: ${usuariosResponse.status} ${usuariosResponse.statusText}`);
         }
         
         const usuariosData = await usuariosResponse.json();
@@ -95,7 +65,7 @@ const AdminUsuarios = () => {
         });
         
         if (!clientesResponse.ok) {
-          throw new Error('Error al cargar clientes');
+          throw new Error(`Error al cargar clientes: ${clientesResponse.status} ${clientesResponse.statusText}`);
         }
         
         const clientesData = await clientesResponse.json();
@@ -140,45 +110,14 @@ const AdminUsuarios = () => {
       // Validar que id_cliente sea un número válido o null
       const id_cliente = formData.id_cliente === '' ? null : parseInt(formData.id_cliente);
       
-      // Obtener token y verificar si es admin
+      // Obtener token
       const token = localStorage.getItem('token');
-      const userData = JSON.parse(localStorage.getItem('user') || '{}');
-      const isAdminToken = token && token.startsWith('admin_mock_token_');
-      const isAdminUser = userData && (userData.role === 'admin' || userData.email === 'admin@hotmail.com');
       
       if (!token) {
         throw new Error('No hay token de autenticación');
       }
       
-      // Si es admin mock, solo actualizar los datos localmente
-      if (isAdminToken || isAdminUser) {
-        console.log("Admin mock: Simulando actualización local");
-        
-        // Simulación de actualización
-        const updatedUsuarios = usuarios.map(usuario => {
-          if (usuario.id === usuarioId) {
-            return {
-              ...usuario,
-              id_cliente: id_cliente,
-              numero_cliente: formData.numero_cliente
-            };
-          }
-          return usuario;
-        });
-        
-        setUsuarios(updatedUsuarios);
-        setEditingUserId(null);
-        setSuccessMessage('Usuario actualizado correctamente (simulación)');
-        
-        // Ocultar mensaje después de 3 segundos
-        setTimeout(() => {
-          setSuccessMessage('');
-        }, 3000);
-        
-        return; // No continuar con la llamada a la API
-      }
-      
-      // Si llegamos aquí, es un token real y podemos intentar llamar a la API
+      // Enviar solicitud a la API
       const response = await fetch(`${API_URL}/api/admin/usuarios/${usuarioId}`, {
         method: 'PUT',
         headers: {
@@ -192,7 +131,8 @@ const AdminUsuarios = () => {
       });
       
       if (!response.ok) {
-        throw new Error('Error al actualizar usuario');
+        const errorData = await response.json();
+        throw new Error(errorData.detail || 'Error al actualizar usuario');
       }
       
       const updatedUsuario = await response.json();
@@ -224,6 +164,61 @@ const AdminUsuarios = () => {
     }
   };
   
+  // Confirmar eliminación
+  const handleDeleteClick = (usuarioId) => {
+    setConfirmDelete(usuarioId);
+  };
+  
+  // Cancelar eliminación
+  const handleCancelDelete = () => {
+    setConfirmDelete(null);
+  };
+  
+  // Eliminar usuario
+  const handleDeleteConfirm = async (usuarioId) => {
+    try {
+      setError(null);
+      
+      // Obtener token
+      const token = localStorage.getItem('token');
+      
+      if (!token) {
+        throw new Error('No hay token de autenticación');
+      }
+      
+      // Enviar solicitud a la API
+      const response = await fetch(`${API_URL}/api/admin/usuarios/${usuarioId}`, {
+        method: 'DELETE',
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+      
+      if (!response.ok) {
+        if (response.status !== 204) { // No Content es un estado válido para DELETE
+          const errorData = await response.json().catch(() => ({}));
+          throw new Error(errorData.detail || `Error al eliminar usuario: ${response.status}`);
+        }
+      }
+      
+      // Actualizar lista de usuarios
+      const updatedUsuarios = usuarios.filter(usuario => usuario.id !== usuarioId);
+      setUsuarios(updatedUsuarios);
+      setConfirmDelete(null);
+      setSuccessMessage('Usuario eliminado correctamente');
+      
+      // Ocultar mensaje después de 3 segundos
+      setTimeout(() => {
+        setSuccessMessage('');
+      }, 3000);
+      
+    } catch (error) {
+      console.error("Error al eliminar usuario:", error);
+      setError(error.message || 'Error al eliminar usuario');
+      setConfirmDelete(null);
+    }
+  };
+  
   // Cancelar edición
   const handleCancelEdit = () => {
     setEditingUserId(null);
@@ -244,7 +239,7 @@ const AdminUsuarios = () => {
   return (
     <div className="admin-usuarios-container">
       <h2>Administración de Usuarios</h2>
-      <p>Asigna clientes a los usuarios registrados en el sistema.</p>
+      <p>Asigna clientes a los usuarios registrados en el sistema o elimina usuarios.</p>
       
       {error && <div className="error-message">{error}</div>}
       {successMessage && <div className="success-message">{successMessage}</div>}
@@ -315,13 +310,36 @@ const AdminUsuarios = () => {
                         Cancelar
                       </button>
                     </div>
+                  ) : confirmDelete === usuario.id ? (
+                    <div className="action-buttons">
+                      <button 
+                        className="delete-confirm-button"
+                        onClick={() => handleDeleteConfirm(usuario.id)}
+                      >
+                        Confirmar
+                      </button>
+                      <button 
+                        className="cancel-button"
+                        onClick={handleCancelDelete}
+                      >
+                        Cancelar
+                      </button>
+                    </div>
                   ) : (
-                    <button 
-                      className="edit-button"
-                      onClick={() => handleEditClick(usuario)}
-                    >
-                      Editar
-                    </button>
+                    <div className="action-buttons">
+                      <button 
+                        className="edit-button"
+                        onClick={() => handleEditClick(usuario)}
+                      >
+                        Editar
+                      </button>
+                      <button 
+                        className="delete-button"
+                        onClick={() => handleDeleteClick(usuario.id)}
+                      >
+                        Eliminar
+                      </button>
+                    </div>
                   )}
                 </td>
               </tr>
