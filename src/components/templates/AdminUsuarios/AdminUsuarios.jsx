@@ -37,12 +37,43 @@ const AdminUsuarios = () => {
       try {
         // Obtener token para autenticación
         const token = localStorage.getItem('token');
+        const userData = JSON.parse(localStorage.getItem('user') || '{}');
+        
+        console.log("Token disponible:", !!token); // Depuración
+        console.log("Usuario almacenado:", userData); // Depuración
+        
+        // Verificar si es admin por token mock o usuario almacenado
+        const isAdminToken = token && token.startsWith('admin_mock_token_');
+        const isAdminUser = userData && (userData.role === 'admin' || userData.email === 'admin@hotmail.com');
         
         if (!token) {
-          throw new Error('No hay token de autenticación');
+          throw new Error('No hay token de autenticación. Por favor inicia sesión nuevamente.');
         }
         
-        // Cargar usuarios
+        // Si es un token mock de admin o el usuario es admin, usar datos simulados
+        if (isAdminToken || isAdminUser) {
+          console.log("Usando datos simulados para admin");
+          
+          // Datos simulados para desarrollo
+          const mockUsuarios = [
+            { id: 1, nombre_completo: 'Juan Pérez', email: 'juan@example.com', numero_cliente: '001', id_cliente: null },
+            { id: 2, nombre_completo: 'María García', email: 'maria@example.com', numero_cliente: '002', id_cliente: 1 },
+            { id: 3, nombre_completo: 'Carlos López', email: 'carlos@example.com', numero_cliente: '', id_cliente: null },
+          ];
+          
+          const mockClientes = [
+            { id: 1, nombre: 'Empresa A' },
+            { id: 2, nombre: 'Empresa B' },
+            { id: 3, nombre: 'Empresa C' },
+          ];
+          
+          setUsuarios(mockUsuarios);
+          setClientes(mockClientes);
+          setLoading(false);
+          return; // Detener ejecución, no intentar llamar a la API
+        }
+        
+        // Si llegamos aquí, es un token real y podemos intentar llamar a la API
         const usuariosResponse = await fetch(`${API_URL}/api/admin/usuarios`, {
           headers: {
             'Authorization': `Bearer ${token}`
@@ -83,30 +114,6 @@ const AdminUsuarios = () => {
     }
   }, [isAuthenticated, isAdmin]);
   
-  // Si no hay API implementada, usar datos de prueba
-  useEffect(() => {
-    // Simular datos si la API no está disponible
-    if (loading && !error) {
-      // Datos de prueba para usuarios
-      const mockUsuarios = [
-        { id: 1, nombre_completo: 'Juan Pérez', email: 'juan@example.com', numero_cliente: '001', id_cliente: null },
-        { id: 2, nombre_completo: 'María García', email: 'maria@example.com', numero_cliente: '002', id_cliente: 1 },
-        { id: 3, nombre_completo: 'Carlos López', email: 'carlos@example.com', numero_cliente: '', id_cliente: null },
-      ];
-      
-      // Datos de prueba para clientes
-      const mockClientes = [
-        { id: 1, nombre: 'Empresa A' },
-        { id: 2, nombre: 'Empresa B' },
-        { id: 3, nombre: 'Empresa C' },
-      ];
-      
-      setUsuarios(mockUsuarios);
-      setClientes(mockClientes);
-      setLoading(false);
-    }
-  }, [loading, error]);
-  
   // Manejar click para editar
   const handleEditClick = (usuario) => {
     setEditingUserId(usuario.id);
@@ -133,14 +140,45 @@ const AdminUsuarios = () => {
       // Validar que id_cliente sea un número válido o null
       const id_cliente = formData.id_cliente === '' ? null : parseInt(formData.id_cliente);
       
-      // Obtener token para autenticación
+      // Obtener token y verificar si es admin
       const token = localStorage.getItem('token');
+      const userData = JSON.parse(localStorage.getItem('user') || '{}');
+      const isAdminToken = token && token.startsWith('admin_mock_token_');
+      const isAdminUser = userData && (userData.role === 'admin' || userData.email === 'admin@hotmail.com');
       
       if (!token) {
         throw new Error('No hay token de autenticación');
       }
       
-      // Enviar datos actualizados a la API
+      // Si es admin mock, solo actualizar los datos localmente
+      if (isAdminToken || isAdminUser) {
+        console.log("Admin mock: Simulando actualización local");
+        
+        // Simulación de actualización
+        const updatedUsuarios = usuarios.map(usuario => {
+          if (usuario.id === usuarioId) {
+            return {
+              ...usuario,
+              id_cliente: id_cliente,
+              numero_cliente: formData.numero_cliente
+            };
+          }
+          return usuario;
+        });
+        
+        setUsuarios(updatedUsuarios);
+        setEditingUserId(null);
+        setSuccessMessage('Usuario actualizado correctamente (simulación)');
+        
+        // Ocultar mensaje después de 3 segundos
+        setTimeout(() => {
+          setSuccessMessage('');
+        }, 3000);
+        
+        return; // No continuar con la llamada a la API
+      }
+      
+      // Si llegamos aquí, es un token real y podemos intentar llamar a la API
       const response = await fetch(`${API_URL}/api/admin/usuarios/${usuarioId}`, {
         method: 'PUT',
         headers: {
@@ -157,13 +195,15 @@ const AdminUsuarios = () => {
         throw new Error('Error al actualizar usuario');
       }
       
-      // Simulación de actualización local (para desarrollo)
+      const updatedUsuario = await response.json();
+      
+      // Actualizar lista de usuarios
       const updatedUsuarios = usuarios.map(usuario => {
         if (usuario.id === usuarioId) {
           return {
             ...usuario,
-            id_cliente: id_cliente,
-            numero_cliente: formData.numero_cliente
+            id_cliente: updatedUsuario.id_cliente,
+            numero_cliente: updatedUsuario.numero_cliente
           };
         }
         return usuario;

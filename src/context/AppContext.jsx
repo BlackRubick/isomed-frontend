@@ -27,6 +27,19 @@ export const AppProvider = ({ children }) => {
       
       if (token) {
         try {
+          // Verificar si es un token mock para admin
+          if (token.startsWith('admin_mock_token_')) {
+            console.log("Token mock de admin detectado, usando datos guardados");
+            if (savedUser) {
+              const userData = JSON.parse(savedUser);
+              setIsAuthenticated(true);
+              setUser(userData);
+              setIsAdmin(true);
+              setLoading(false);
+              return;
+            }
+          }
+          
           // Intentar obtener datos del usuario desde la API usando el token
           console.log("Verificando token con la API...");
           const response = await fetch(`${API_URL}/api/auth/me`, {
@@ -233,6 +246,11 @@ export const AppProvider = ({ children }) => {
         numero_cliente: "",
         id_cliente: null
       };
+      
+      // NUEVO: Generar token mock para admin
+      const adminMockToken = `admin_mock_token_${Date.now()}`;
+      localStorage.setItem('token', adminMockToken);
+      console.log("Token mock para admin guardado:", adminMockToken);
       
       localStorage.setItem('isAuthenticated', 'true');
       localStorage.setItem('user', JSON.stringify(admin));
