@@ -130,7 +130,13 @@ const Login = () => {
       
       // Guardar token en localStorage
       localStorage.setItem('token', data.token);
-      
+      localStorage.setItem('token', data.token);
+      localStorage.setItem('user', JSON.stringify(userDataFormatted));
+      localStorage.setItem('isAuthenticated', 'true');
+      setIsAuthenticated(true);
+      setUser(userDataFormatted);
+      setIsAdmin(userIsAdmin);
+      setToken(data.token);
       // Guardar datos del usuario
       localStorage.setItem('user', JSON.stringify(data.user));
       

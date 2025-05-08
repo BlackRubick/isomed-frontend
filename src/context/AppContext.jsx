@@ -226,63 +226,72 @@ export const AppProvider = ({ children }) => {
   };
   
   // Login local para compatibilidad y usuarios admin hardcodeados
-  const loginLocal = (userData) => {
-    console.log("Login local con:", userData);
+// En AppContext.jsx, modifica la función loginLocal
+const loginLocal = (userData) => {
+  console.log("Login local con:", userData);
+  
+  // Verificación más clara para admin
+  const isAdminUser = 
+    userData.email === 'admin@hotmail.com' || 
+    userData.role === 'admin';
+  
+  if (isAdminUser) {
+    console.log("Detectado usuario admin");
     
-    // Verificación más clara para admin
-    const isAdminUser = 
-      userData.email === 'admin@hotmail.com' || 
-      userData.role === 'admin';
+    const admin = {
+      id: 0, // ID ficticio para admin
+      nombre_completo: 'Administrador',
+      name: 'Administrador', // Para compatibilidad
+      email: 'admin@hotmail.com',
+      role: 'admin',
+      numero_cliente: "",
+      id_cliente: null
+    };
     
-    if (isAdminUser) {
-      console.log("Detectado usuario admin");
-      
-      const admin = {
-        id: 0, // ID ficticio para admin
-        nombre_completo: 'Administrador',
-        name: 'Administrador', // Para compatibilidad
-        email: 'admin@hotmail.com',
-        role: 'admin',
-        numero_cliente: "",
-        id_cliente: null
-      };
-      
-      // NUEVO: Generar token mock para admin
-      const adminMockToken = `admin_mock_token_${Date.now()}`;
-      localStorage.setItem('token', adminMockToken);
-      console.log("Token mock para admin guardado:", adminMockToken);
-      
-      localStorage.setItem('isAuthenticated', 'true');
-      localStorage.setItem('user', JSON.stringify(admin));
-      
-      // Establecer explícitamente como admin
-      setIsAuthenticated(true);
-      setUser(admin);
-      setIsAdmin(true);
-      
-      console.log("Estado actualizado - isAdmin:", true);
-    } else {
-      // Login de usuario normal
-      const userFormatted = {
-        ...userData,
-        nombre_completo: userData.nombre_completo || userData.name || "Usuario",
-        name: userData.name || userData.nombre_completo || "Usuario",
-        role: userData.role || 'user'
-      };
-      
-      localStorage.setItem('isAuthenticated', 'true');
-      localStorage.setItem('user', JSON.stringify(userFormatted));
-      setIsAuthenticated(true);
-      setUser(userFormatted);
-      setIsAdmin(false);
-      
-      console.log("Estado actualizado - usuario normal:", {
-        isAuthenticated: true,
-        user: userFormatted,
-        isAdmin: false
-      });
-    }
-  };
+    // NUEVO: Generar token mock para admin
+    const adminMockToken = `admin_mock_token_${Date.now()}`;
+    localStorage.setItem('token', adminMockToken);
+    console.log("Token mock para admin guardado:", adminMockToken);
+    
+    localStorage.setItem('isAuthenticated', 'true');
+    localStorage.setItem('user', JSON.stringify(admin));
+    
+    // Establecer explícitamente como admin
+    setIsAuthenticated(true);
+    setUser(admin);
+    setIsAdmin(true);
+    setToken(adminMockToken); // AÑADIR ESTA LÍNEA
+    
+    console.log("Estado actualizado - isAdmin:", true);
+  } else {
+    // Login de usuario normal
+    const userFormatted = {
+      ...userData,
+      nombre_completo: userData.nombre_completo || userData.name || "Usuario",
+      name: userData.name || userData.nombre_completo || "Usuario",
+      role: userData.role || 'user'
+    };
+    
+    // NUEVO: Generar token mock para usuario normal
+    const userMockToken = `user_mock_token_${Date.now()}`;
+    localStorage.setItem('token', userMockToken);
+    console.log("Token mock para usuario guardado:", userMockToken);
+    
+    localStorage.setItem('isAuthenticated', 'true');
+    localStorage.setItem('user', JSON.stringify(userFormatted));
+    setIsAuthenticated(true);
+    setUser(userFormatted);
+    setIsAdmin(false);
+    setToken(userMockToken); // AÑADIR ESTA LÍNEA
+    
+    console.log("Estado actualizado - usuario normal:", {
+      isAuthenticated: true,
+      user: userFormatted,
+      isAdmin: false,
+      token: userMockToken // Añadir para debug
+    });
+  }
+};
   
   // Función para cerrar sesión
   const logout = () => {

@@ -60,7 +60,6 @@ const OrdenesTrabajoUsuario = () => {
   const tiposProducto = ['SERVICIO', 'INSUMO', 'EQUIPO', 'REPUESTO'];
 
   useEffect(() => {
-    console.log("Token actual:", token);
     const fetchOrdenes = async () => {
       try {
         setLoading(true);
@@ -75,8 +74,52 @@ const OrdenesTrabajoUsuario = () => {
         
         console.log("Buscando órdenes para cliente ID:", user.id_cliente);
         
+        // Verificar si hay token disponible
+        if (!token) {
+          console.warn("Token no disponible, intentando recuperar de localStorage");
+          const storedToken = localStorage.getItem('token');
+          
+          if (!storedToken) {
+            console.error("No se encontró token en localStorage, usando datos de ejemplo");
+            setOrdenes(datosEjemplo);
+            setLoading(false);
+            return;
+          }
+          
+          // Usar el token almacenado
+          console.log("Usando token recuperado de localStorage");
+          
+          try {
+            // Intentar obtener datos reales de la API con el token recuperado
+            const response = await fetch(`/api/ordenes/cliente/${user.id_cliente}`, {
+              method: 'GET',
+              headers: {
+                'Authorization': `Bearer ${storedToken}`,
+                'Content-Type': 'application/json'
+              }
+            });
+            
+            if (response.ok) {
+              const data = await response.json();
+              console.log("Datos de órdenes recibidos:", data);
+              setOrdenes(Array.isArray(data) ? data : []);
+            } else {
+              // Si la API no responde correctamente, usar datos de ejemplo
+              console.warn("API no disponible con token recuperado, usando datos de ejemplo");
+              setOrdenes(datosEjemplo);
+            }
+          } catch (error) {
+            console.warn("Error de conexión con token recuperado, usando datos de ejemplo:", error);
+            setOrdenes(datosEjemplo);
+          }
+          
+          setLoading(false);
+          return;
+        }
+        
+        // Si hay token disponible, continuar normalmente
         try {
-          // Intentar obtener datos reales de la API
+          console.log("Usando token del contexto:", token);
           const response = await fetch(`/api/ordenes/cliente/${user.id_cliente}`, {
             method: 'GET',
             headers: {
@@ -107,7 +150,7 @@ const OrdenesTrabajoUsuario = () => {
         setLoading(false);
       }
     };
-
+  
     fetchOrdenes();
   }, [user, token]);
 
@@ -184,7 +227,18 @@ const OrdenesTrabajoUsuario = () => {
         setLoading(false);
         return;
       }
-      
+      let currentToken = token;
+      if (!currentToken) {
+        console.warn("Token no disponible en contexto, intentando recuperar de localStorage");
+        currentToken = localStorage.getItem('token');
+        
+        if (!currentToken) {
+          console.error("No se encontró token en localStorage");
+          throw new Error("No hay token de autenticación disponible");
+        }
+        
+        console.log("Token recuperado de localStorage:", currentToken);
+      }
       // IMPORTANTE: Actualmente tu modelo de BD solo soporta una línea de producto
       // por orden, por lo que solo enviaremos la primera línea
       const primeraLinea = nuevaOrden.lineasProducto[0];
@@ -204,12 +258,12 @@ const OrdenesTrabajoUsuario = () => {
       };
       
       console.log("Enviando datos de orden:", datosOrden);
-      
+      console.log("Token utilizado:", currentToken);      
       // Realizar la petición a la API
       const response = await fetch('/api/ordenes', {
         method: 'POST',
         headers: {
-          'Authorization': `Bearer ${token}`,
+          'Authorization': `Bearer ${currentToken}`,
           'Content-Type': 'application/json'
         },
         body: JSON.stringify(datosOrden)
