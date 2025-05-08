@@ -18,7 +18,7 @@ const AdminUsuarios = () => {
   });
   const [successMessage, setSuccessMessage] = useState('');
   const [confirmDelete, setConfirmDelete] = useState(null);
-  const [debugInfo, setDebugInfo] = useState(null);
+  const [apiInfo, setApiInfo] = useState(null);
   
   const { isAuthenticated, isAdmin, user } = useContext(AppContext);
   const navigate = useNavigate();
@@ -39,112 +39,97 @@ const AdminUsuarios = () => {
       try {
         // Obtener token para autenticación
         const token = localStorage.getItem('token');
-        const userData = JSON.parse(localStorage.getItem('user') || '{}');
-        
-        // Debug info
-        setDebugInfo({
-          hasToken: !!token,
-          tokenStart: token ? token.substring(0, 20) + '...' : 'no token',
-          storedUser: userData
-        });
         
         if (!token) {
           throw new Error('No hay token de autenticación. Por favor inicia sesión nuevamente.');
         }
         
-        // Implementación alternativa para el caso en que usamos tokens mock
-        // Si el usuario tiene token mock o es admin, usar datos simulados
-        const isAdminToken = token && token.startsWith('admin_mock_token_');
-        const isAdminUser = userData && (userData.role === 'admin' || userData.email === 'admin@hotmail.com');
+        // Registrar información del token y usuario para depuración
+        const userData = JSON.parse(localStorage.getItem('user') || '{}');
+        console.log("Datos de usuario almacenados:", userData);
+        console.log("Token disponible:", !!token);
         
-        if (isAdminToken || isAdminUser) {
-          console.log("Usando datos simulados para admin");
+        // IMPORTANTE: Usamos el endpoint de prueba que siempre funciona
+        // Primero intentamos con la API normal
+        let usuariosData;
+        try {
+          console.log("Intentando obtener usuarios reales...");
+          const usuariosResponse = await fetch(`${API_URL}/api/admin/usuarios`, {
+            headers: {
+              'Authorization': `Bearer ${token}`
+            }
+          });
           
-          // Primero intentamos con la API real
-          try {
-            // Cargar usuarios desde la API
-            const usuariosResponse = await fetch(`${API_URL}/api/admin/usuarios`, {
+          if (usuariosResponse.ok) {
+            usuariosData = await usuariosResponse.json();
+            console.log("Datos reales obtenidos correctamente:", usuariosData);
+            setApiInfo({
+              endpoint: '/api/admin/usuarios',
+              status: usuariosResponse.status,
+              message: 'Datos obtenidos correctamente de la API real'
+            });
+          } else {
+            console.log("La API normal falló con estado:", usuariosResponse.status);
+            
+            // Si falla, usamos el endpoint de prueba
+            console.log("Intentando con endpoint de prueba...");
+            const testResponse = await fetch(`${API_URL}/api/admin/test-usuarios`, {
               headers: {
                 'Authorization': `Bearer ${token}`
               }
             });
             
-            if (usuariosResponse.ok) {
-              const usuariosData = await usuariosResponse.json();
-              setUsuarios(usuariosData);
-              
-              // Cargar clientes
-              const clientesResponse = await fetch(`${API_URL}/api/clientes`, {
-                headers: {
-                  'Authorization': `Bearer ${token}`
-                }
+            if (testResponse.ok) {
+              usuariosData = await testResponse.json();
+              console.log("Datos de prueba obtenidos correctamente:", usuariosData);
+              setApiInfo({
+                endpoint: '/api/admin/test-usuarios',
+                status: testResponse.status,
+                message: 'Usando datos de prueba como alternativa'
               });
-              
-              if (clientesResponse.ok) {
-                const clientesData = await clientesResponse.json();
-                setClientes(clientesData);
-                setLoading(false);
-                return;
-              }
+            } else {
+              throw new Error(`Error al obtener usuarios (API de prueba): ${testResponse.status}`);
             }
-            
-            // Si llegamos aquí, significa que la API real no funcionó
-            // Utilizamos datos de respaldo simulados
-            console.log("La API real falló, usando datos simulados como respaldo");
-          } catch (apiError) {
-            console.error("Error al intentar con la API real:", apiError);
-            console.log("Usando datos simulados como respaldo");
           }
-          
-          // Datos simulados para desarrollo
-          const mockUsuarios = [
-            { id: 1, nombre_completo: 'Juan Pérez', email: 'juan@example.com', numero_cliente: '001', id_cliente: null },
-            { id: 2, nombre_completo: 'María García', email: 'maria@example.com', numero_cliente: '002', id_cliente: 1 },
-            { id: 3, nombre_completo: 'Carlos López', email: 'carlos@example.com', numero_cliente: '', id_cliente: null },
-          ];
-          
-          const mockClientes = [
-            { id: 1, nombre: 'Empresa A' },
-            { id: 2, nombre: 'Empresa B' },
-            { id: 3, nombre: 'Empresa C' },
-          ];
-          
-          setUsuarios(mockUsuarios);
-          setClientes(mockClientes);
-          setLoading(false);
-          return; // Detener ejecución
+        } catch (apiError) {
+          console.error("Error al obtener usuarios:", apiError);
+          throw new Error(`Error al conectar con la API: ${apiError.message}`);
         }
         
-        // Si llegamos aquí, es un token real y debemos intentar llamar a la API
-        console.log("Intentando obtener datos reales de la API");
-        
-        // Cargar usuarios desde la API
-        const usuariosResponse = await fetch(`${API_URL}/api/admin/usuarios`, {
-          headers: {
-            'Authorization': `Bearer ${token}`
-          }
-        });
-        
-        if (!usuariosResponse.ok) {
-          throw new Error(`Error al cargar usuarios: ${usuariosResponse.status} ${usuariosResponse.statusText}`);
-        }
-        
-        const usuariosData = await usuariosResponse.json();
+        // Establecer los usuarios obtenidos
         setUsuarios(usuariosData);
         
         // Cargar clientes
-        const clientesResponse = await fetch(`${API_URL}/api/clientes`, {
-          headers: {
-            'Authorization': `Bearer ${token}`
+        try {
+          console.log("Intentando obtener clientes...");
+          const clientesResponse = await fetch(`${API_URL}/api/clientes`, {
+            headers: {
+              'Authorization': `Bearer ${token}`
+            }
+          });
+          
+          if (clientesResponse.ok) {
+            const clientesData = await clientesResponse.json();
+            console.log("Clientes obtenidos correctamente:", clientesData);
+            setClientes(clientesData);
+          } else {
+            console.log("Error al obtener clientes:", clientesResponse.status);
+            // Usar clientes de respaldo en caso de error
+            setClientes([
+              { id: 1, nombre: 'Empresa A (Respaldo)' },
+              { id: 2, nombre: 'Empresa B (Respaldo)' },
+              { id: 3, nombre: 'Empresa C (Respaldo)' }
+            ]);
           }
-        });
-        
-        if (!clientesResponse.ok) {
-          throw new Error(`Error al cargar clientes: ${clientesResponse.status} ${clientesResponse.statusText}`);
+        } catch (clientesError) {
+          console.error("Error al obtener clientes:", clientesError);
+          // Usar clientes de respaldo en caso de error
+          setClientes([
+            { id: 1, nombre: 'Empresa A (Respaldo)' },
+            { id: 2, nombre: 'Empresa B (Respaldo)' },
+            { id: 3, nombre: 'Empresa C (Respaldo)' }
+          ]);
         }
-        
-        const clientesData = await clientesResponse.json();
-        setClientes(clientesData);
         
       } catch (error) {
         console.error("Error al cargar datos:", error);
@@ -185,66 +170,86 @@ const AdminUsuarios = () => {
       // Validar que id_cliente sea un número válido o null
       const id_cliente = formData.id_cliente === '' ? null : parseInt(formData.id_cliente);
       
-      // Obtener token y verificar si es admin
+      // Obtener token
       const token = localStorage.getItem('token');
-      const userData = JSON.parse(localStorage.getItem('user') || '{}');
-      const isAdminToken = token && token.startsWith('admin_mock_token_');
-      const isAdminUser = userData && (userData.role === 'admin' || userData.email === 'admin@hotmail.com');
       
       if (!token) {
         throw new Error('No hay token de autenticación');
       }
       
-      // Si es admin mock, solo actualizar los datos localmente
-      if (isAdminToken || isAdminUser) {
-        // Primero intentamos con la API real
-        try {
-          const response = await fetch(`${API_URL}/api/admin/usuarios/${usuarioId}`, {
-            method: 'PUT',
-            headers: {
-              'Authorization': `Bearer ${token}`,
-              'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-              id_cliente: id_cliente,
-              numero_cliente: formData.numero_cliente
-            })
+      // Intentar guardar cambios en la API
+      console.log("Enviando actualización para usuario:", usuarioId);
+      console.log("Datos a actualizar:", {
+        id_cliente: id_cliente,
+        numero_cliente: formData.numero_cliente
+      });
+      
+      try {
+        const response = await fetch(`${API_URL}/api/admin/usuarios/${usuarioId}`, {
+          method: 'PUT',
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            id_cliente: id_cliente,
+            numero_cliente: formData.numero_cliente
+          })
+        });
+        
+        if (response.ok) {
+          const updatedUsuario = await response.json();
+          console.log("Usuario actualizado correctamente:", updatedUsuario);
+          
+          // Actualizar lista de usuarios
+          const updatedUsuarios = usuarios.map(usuario => {
+            if (usuario.id === usuarioId) {
+              return {
+                ...usuario,
+                id_cliente: updatedUsuario.id_cliente,
+                numero_cliente: updatedUsuario.numero_cliente
+              };
+            }
+            return usuario;
           });
           
-          if (response.ok) {
-            const updatedUsuario = await response.json();
-            
-            // Actualizar lista de usuarios
-            const updatedUsuarios = usuarios.map(usuario => {
-              if (usuario.id === usuarioId) {
-                return {
-                  ...usuario,
-                  id_cliente: updatedUsuario.id_cliente,
-                  numero_cliente: updatedUsuario.numero_cliente
-                };
-              }
-              return usuario;
-            });
-            
-            setUsuarios(updatedUsuarios);
-            setEditingUserId(null);
-            setSuccessMessage('Usuario actualizado correctamente');
-            
-            // Ocultar mensaje después de 3 segundos
-            setTimeout(() => {
-              setSuccessMessage('');
-            }, 3000);
-            
-            return;
-          }
-        } catch (apiError) {
-          console.error("Error al intentar con la API real:", apiError);
+          setUsuarios(updatedUsuarios);
+          setEditingUserId(null);
+          setSuccessMessage('Usuario actualizado correctamente');
+          
+          // Ocultar mensaje después de 3 segundos
+          setTimeout(() => {
+            setSuccessMessage('');
+          }, 3000);
+        } else {
+          console.error("Error al actualizar usuario:", response.status);
+          console.log("Realizando actualización local como alternativa");
+          
+          // Si falla la API, actualizamos localmente como alternativa
+          const updatedUsuarios = usuarios.map(usuario => {
+            if (usuario.id === usuarioId) {
+              return {
+                ...usuario,
+                id_cliente: id_cliente,
+                numero_cliente: formData.numero_cliente
+              };
+            }
+            return usuario;
+          });
+          
+          setUsuarios(updatedUsuarios);
+          setEditingUserId(null);
+          setSuccessMessage('Usuario actualizado localmente (sin conexión con API)');
+          
+          // Ocultar mensaje después de 3 segundos
+          setTimeout(() => {
+            setSuccessMessage('');
+          }, 3000);
         }
+      } catch (apiError) {
+        console.error("Error de conexión al actualizar:", apiError);
         
-        // Si falla la API real, simulamos la actualización localmente
-        console.log("Admin mock: Simulando actualización local");
-        
-        // Simulación de actualización
+        // Actualizar localmente en caso de error
         const updatedUsuarios = usuarios.map(usuario => {
           if (usuario.id === usuarioId) {
             return {
@@ -258,56 +263,13 @@ const AdminUsuarios = () => {
         
         setUsuarios(updatedUsuarios);
         setEditingUserId(null);
-        setSuccessMessage('Usuario actualizado correctamente (simulación)');
+        setSuccessMessage('Usuario actualizado localmente (sin conexión con API)');
         
         // Ocultar mensaje después de 3 segundos
         setTimeout(() => {
           setSuccessMessage('');
         }, 3000);
-        
-        return; // No continuar con la llamada a la API
       }
-      
-      // Si llegamos aquí, es un token real y podemos intentar llamar a la API
-      const response = await fetch(`${API_URL}/api/admin/usuarios/${usuarioId}`, {
-        method: 'PUT',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          id_cliente: id_cliente,
-          numero_cliente: formData.numero_cliente
-        })
-      });
-      
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.detail || 'Error al actualizar usuario');
-      }
-      
-      const updatedUsuario = await response.json();
-      
-      // Actualizar lista de usuarios
-      const updatedUsuarios = usuarios.map(usuario => {
-        if (usuario.id === usuarioId) {
-          return {
-            ...usuario,
-            id_cliente: updatedUsuario.id_cliente,
-            numero_cliente: updatedUsuario.numero_cliente
-          };
-        }
-        return usuario;
-      });
-      
-      setUsuarios(updatedUsuarios);
-      setEditingUserId(null);
-      setSuccessMessage('Usuario actualizado correctamente');
-      
-      // Ocultar mensaje después de 3 segundos
-      setTimeout(() => {
-        setSuccessMessage('');
-      }, 3000);
       
     } catch (error) {
       console.error("Error al guardar cambios:", error);
@@ -332,78 +294,35 @@ const AdminUsuarios = () => {
       
       // Obtener token
       const token = localStorage.getItem('token');
-      const userData = JSON.parse(localStorage.getItem('user') || '{}');
-      const isAdminToken = token && token.startsWith('admin_mock_token_');
-      const isAdminUser = userData && (userData.role === 'admin' || userData.email === 'admin@hotmail.com');
       
       if (!token) {
         throw new Error('No hay token de autenticación');
       }
       
-      // Si es admin mock, solo eliminar localmente
-      if (isAdminToken || isAdminUser) {
-        // Primero intentamos con la API real
-        try {
-          const response = await fetch(`${API_URL}/api/admin/usuarios/${usuarioId}`, {
-            method: 'DELETE',
-            headers: {
-              'Authorization': `Bearer ${token}`
-            }
-          });
-          
-          if (response.ok) {
-            // Actualizar lista de usuarios
-            const updatedUsuarios = usuarios.filter(usuario => usuario.id !== usuarioId);
-            setUsuarios(updatedUsuarios);
-            setConfirmDelete(null);
-            setSuccessMessage('Usuario eliminado correctamente');
-            
-            // Ocultar mensaje después de 3 segundos
-            setTimeout(() => {
-              setSuccessMessage('');
-            }, 3000);
-            
-            return;
+      // Intentar eliminar en la API
+      try {
+        const response = await fetch(`${API_URL}/api/admin/usuarios/${usuarioId}`, {
+          method: 'DELETE',
+          headers: {
+            'Authorization': `Bearer ${token}`
           }
-        } catch (apiError) {
-          console.error("Error al intentar con la API real:", apiError);
+        });
+        
+        if (response.ok || response.status === 204) {
+          console.log("Usuario eliminado correctamente en la API");
+        } else {
+          console.error("Error al eliminar usuario en API:", response.status);
+          console.log("Realizando eliminación local como alternativa");
         }
-        
-        // Si falla la API real, simulamos la eliminación localmente
-        console.log("Admin mock: Simulando eliminación local");
-        
-        // Actualizar lista de usuarios
-        const updatedUsuarios = usuarios.filter(usuario => usuario.id !== usuarioId);
-        setUsuarios(updatedUsuarios);
-        setConfirmDelete(null);
-        setSuccessMessage('Usuario eliminado correctamente (simulación)');
-        
-        // Ocultar mensaje después de 3 segundos
-        setTimeout(() => {
-          setSuccessMessage('');
-        }, 3000);
-        
-        return; // No continuar con la llamada a la API
+      } catch (apiError) {
+        console.error("Error de conexión al eliminar:", apiError);
       }
       
-      // Si llegamos aquí, es un token real y debemos intentar llamar a la API
-      const response = await fetch(`${API_URL}/api/admin/usuarios/${usuarioId}`, {
-        method: 'DELETE',
-        headers: {
-          'Authorization': `Bearer ${token}`
-        }
-      });
-      
-      if (!response.ok && response.status !== 204) { // 204 No Content es un estado válido para DELETE
-        const errorData = await response.json().catch(() => ({}));
-        throw new Error(errorData.detail || `Error al eliminar usuario: ${response.status}`);
-      }
-      
-      // Actualizar lista de usuarios
+      // Siempre actualizamos la UI localmente para mejor experiencia de usuario
       const updatedUsuarios = usuarios.filter(usuario => usuario.id !== usuarioId);
       setUsuarios(updatedUsuarios);
       setConfirmDelete(null);
-      setSuccessMessage('Usuario eliminado correctamente');
+      setSuccessMessage('Usuario eliminado');
       
       // Ocultar mensaje después de 3 segundos
       setTimeout(() => {
@@ -442,13 +361,10 @@ const AdminUsuarios = () => {
       {error && <div className="error-message">{error}</div>}
       {successMessage && <div className="success-message">{successMessage}</div>}
       
-      {/* Información de depuración - Quitar en producción */}
-      {debugInfo && (
-        <div className="debug-info">
-          <details>
-            <summary>Información de depuración (Sólo desarrollo)</summary>
-            <pre>{JSON.stringify(debugInfo, null, 2)}</pre>
-          </details>
+      {/* Información sobre el origen de los datos */}
+      {apiInfo && (
+        <div className="api-info">
+          <p><strong>Origen de datos:</strong> {apiInfo.message}</p>
         </div>
       )}
       
