@@ -60,6 +60,7 @@ const OrdenesTrabajoUsuario = () => {
   const tiposProducto = ['SERVICIO', 'INSUMO', 'EQUIPO', 'REPUESTO'];
 
   useEffect(() => {
+    console.log("Token actual:", token);
     const fetchOrdenes = async () => {
       try {
         setLoading(true);
@@ -254,10 +255,18 @@ const OrdenesTrabajoUsuario = () => {
       alert('Orden de trabajo creada correctamente');
       
     } catch (error) {
-      console.error("Error al crear orden:", error);
-      
-      // Si hay un error, intentar el modo de datos de ejemplo como fallback
-      alert(`Error: ${error.message}. Usando modo de ejemplo como alternativa.`);
+        console.error("Error al crear orden:", error);
+        
+        if (error.message.includes("401") || error.message.includes("Token inválido")) {
+          const recargar = window.confirm("Su sesión ha expirado. ¿Desea recargar la página para iniciar sesión nuevamente?");
+          if (recargar) {
+            window.location.reload();
+            return;
+          }
+        }
+        
+        // Si el usuario no quiere recargar o es otro tipo de error, seguir con el modo de ejemplo
+        alert(`Error: ${error.message}. Usando modo de ejemplo como alternativa.`);
       
       // Simular creación con datos de ejemplo
       const nuevaOrdenEjemplo = {
