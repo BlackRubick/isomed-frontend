@@ -1,9 +1,33 @@
 // src/pages/OrdenesTrabajoUsuario.jsx
 import React, { useState, useEffect, useContext } from 'react';
 import { AppContext } from '../context/AppContext';
+import { useNavigate } from 'react-router-dom';
 import './OrdenesTrabajoUsuario.css';
 
 const OrdenesTrabajoUsuario = () => {
+  // Datos de ejemplo para probar la interfaz mientras el API se implementa
+  const datosEjemplo = [
+    {
+      id: 1,
+      id_cliente: 1,
+      status: '2- COTIZACION',
+      fecha_mov: new Date().toISOString(),
+      lineas_producto: [
+        { id_producto: 1, cantidad: 1, precio_unitario: 18500 },
+        { id_producto: 2, cantidad: 3, precio_unitario: 2300 }
+      ]
+    },
+    {
+      id: 2,
+      id_cliente: 1,
+      status: '5- AGENDAR DE EJECUCION',
+      fecha_mov: new Date(Date.now() - 86400000).toISOString(), // Ayer
+      lineas_producto: [
+        { id_producto: 3, cantidad: 2, precio_unitario: 517 }
+      ]
+    }
+  ];
+
   const [ordenes, setOrdenes] = useState([]);
   const [ordenActual, setOrdenActual] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -14,9 +38,14 @@ const OrdenesTrabajoUsuario = () => {
     estado: '1- PRECOTIZACION',
     lineasProducto: [
       { cantidad: 1, tipo: 'SERVICIO', descripcion: '', precioUnitario: 0 }
-    ]
+    ],
+    observaciones: ''
   });
   const [modoEdicion, setModoEdicion] = useState(false);
+  const [usarDatosEjemplo, setUsarDatosEjemplo] = useState(false);
+  
+  const { user, token, logout } = useContext(AppContext);
+  const navigate = useNavigate();
   
   const estados = [
     '1- PRECOTIZACION',
@@ -30,13 +59,31 @@ const OrdenesTrabajoUsuario = () => {
   ];
   
   const tiposProducto = ['SERVICIO', 'INSUMO', 'EQUIPO', 'REPUESTO'];
-  
-  const { user, token } = useContext(AppContext);
+
+  // Función para manejar la sesión expirada
+  const handleSessionExpired = () => {
+    logout();
+    navigate('/login');
+  };
+
+  // Función para activar el modo de datos de ejemplo
+  const handleUsarDatosEjemplo = () => {
+    setUsarDatosEjemplo(true);
+    setOrdenes(datosEjemplo);
+    setError(null);
+    setLoading(false);
+  };
 
   useEffect(() => {
     const fetchOrdenes = async () => {
       try {
         setLoading(true);
+        
+        // Si ya elegimos usar datos de ejemplo, no hacemos la petición
+        if (usarDatosEjemplo) {
+          setLoading(false);
+          return;
+        }
         
         // Verificar si el usuario tiene id_cliente
         if (!user || !user.id_cliente) {
@@ -46,51 +93,70 @@ const OrdenesTrabajoUsuario = () => {
         }
         
         console.log("Buscando órdenes para cliente ID:", user.id_cliente);
+        console.log("Token siendo utilizado:", token ? "Presente" : "Ausente"); // Sin mostrar todo el token
         
-        // Realizar la solicitud a la API
-        const response = await fetch(`/api/ordenes/cliente/${user.id_cliente}`, {
-          method: 'GET',
-          headers: {
-            'Authorization': `Bearer ${token}`,
-            'Content-Type': 'application/json'
-          }
-        });
-
-        // Registrar información de la respuesta para depuración
-        console.log("Código de estado HTTP:", response.status);
-        
-        // Si la respuesta no es exitosa
-        if (!response.ok) {
-          const errorText = await response.text();
-          console.error("Error en respuesta:", errorText);
-          
-          // Mensaje diferente según el código de error
-          if (response.status === 404) {
-            // En este caso aún podemos continuar y permitir crear nuevas órdenes
-            console.log("No se encontraron órdenes existentes");
-            setOrdenes([]);
-          } else if (response.status === 401) {
-            setError('Su sesión ha expirado. Por favor, inicie sesión nuevamente');
-          } else {
-            setError(`Error al cargar las órdenes de trabajo: ${response.status}`);
-          }
+        // Verificar si hay token
+        if (!token) {
+          setError('No hay token de autenticación. Por favor, inicie sesión nuevamente.');
           setLoading(false);
           return;
         }
+        
+        try {
+          // Realizar la solicitud a la API
+          const response = await fetch(`/api/ordenes/cliente/${user.id_cliente}`, {
+            method: 'GET',
+            headers: {
+              'Authorization': `Bearer ${token}`,
+              'Content-Type': 'application/json'
+            }
+          });
 
-        const data = await response.json();
-        console.log("Datos de órdenes recibidos:", data);
-        setOrdenes(data);
-        setLoading(false);
+          // Registrar información de la respuesta para depuración
+          console.log("Código de estado HTTP:", response.status);
+          
+          // Si la respuesta no es exitosa
+          if (!response.ok) {
+            const errorText = await response.text();
+            console.error("Error en respuesta:", errorText);
+            
+            // Mensaje diferente según el código de error
+            if (response.status === 404) {
+              // En este caso aún podemos continuar y permitir crear nuevas órdenes
+              console.log("No se encontraron órdenes existentes");
+              setOrdenes([]);
+            } else if (response.status === 401) {
+              setError('Su sesión ha expirado. Por favor, inicie sesión nuevamente.');
+            } else {
+              setError(`Error al cargar las órdenes de trabajo: ${response.status}`);
+            }
+            setLoading(false);
+            return;
+          }
+
+          const data = await response.json();
+          console.log("Datos de órdenes recibidos:", data);
+          setOrdenes(Array.isArray(data) ? data : []);
+          setLoading(false);
+        } catch (error) {
+          console.error('Error en la petición:', error);
+          setError(`Error al consultar órdenes: ${error.message}. El servidor podría no estar disponible.`);
+          setLoading(false);
+        }
       } catch (error) {
-        console.error('Error fetching orders:', error);
-        setError(`Error al consultar órdenes: ${error.message}`);
+        console.error('Error en la lógica de carga:', error);
+        setError(`Error inesperado: ${error.message}`);
         setLoading(false);
       }
     };
 
-    fetchOrdenes();
-  }, [user, token]);
+    if (user && token) {
+      fetchOrdenes();
+    } else {
+      setLoading(false);
+      setError('Información de usuario no disponible. Por favor, inicie sesión.');
+    }
+  }, [user, token, navigate, usarDatosEjemplo]);
 
   // Función para calcular el importe de una línea
   const calcularImporte = (cantidad, precioUnitario) => {
@@ -152,8 +218,16 @@ const OrdenesTrabajoUsuario = () => {
       setLoading(true);
       
       // Verificar si los campos obligatorios están completos
-      if (!nuevaOrden.idCliente) {
-        setError('Por favor, especifique el cliente');
+      if (!nuevaOrden.lineasProducto.length) {
+        setError('Por favor, añada al menos una línea de producto');
+        setLoading(false);
+        return;
+      }
+      
+      // Verificar descripciones vacías
+      const lineasVacias = nuevaOrden.lineasProducto.some(linea => !linea.descripcion.trim());
+      if (lineasVacias) {
+        setError('Por favor, complete todas las descripciones de productos');
         setLoading(false);
         return;
       }
@@ -171,6 +245,44 @@ const OrdenesTrabajoUsuario = () => {
       };
       
       console.log("Enviando datos de nueva orden:", datosOrden);
+      
+      // Si estamos usando datos de ejemplo, simular la creación de una orden
+      if (usarDatosEjemplo) {
+        const nuevaOrdenEjemplo = {
+          id: Math.floor(Math.random() * 10000) + 100, // ID aleatorio
+          id_cliente: user.id_cliente,
+          status: nuevaOrden.estado,
+          fecha_mov: new Date().toISOString(),
+          lineas_producto: nuevaOrden.lineasProducto.map(linea => ({
+            id_producto: Math.floor(Math.random() * 100) + 1, // ID aleatorio
+            cantidad: parseInt(linea.cantidad),
+            precio_unitario: parseFloat(linea.precioUnitario),
+            descripcion: linea.descripcion  // Añadir descripción para mostrarla
+          }))
+        };
+        
+        // Actualizar la lista de órdenes con la nueva orden
+        setOrdenes([...ordenes, nuevaOrdenEjemplo]);
+        
+        // Simular una pequeña demora
+        setTimeout(() => {
+          // Resetear el formulario
+          setNuevaOrden({
+            folio: '',
+            idCliente: '',
+            estado: '1- PRECOTIZACION',
+            lineasProducto: [
+              { cantidad: 1, tipo: 'SERVICIO', descripcion: '', precioUnitario: 0 }
+            ],
+            observaciones: ''
+          });
+          
+          setModoEdicion(false);
+          setLoading(false);
+        }, 1000);
+        
+        return;
+      }
       
       // Enviar la orden al backend
       const response = await fetch('/api/ordenes', {
@@ -200,7 +312,8 @@ const OrdenesTrabajoUsuario = () => {
         estado: '1- PRECOTIZACION',
         lineasProducto: [
           { cantidad: 1, tipo: 'SERVICIO', descripcion: '', precioUnitario: 0 }
-        ]
+        ],
+        observaciones: ''
       });
       
       setModoEdicion(false);
@@ -214,7 +327,7 @@ const OrdenesTrabajoUsuario = () => {
   };
 
   // Mostrar un mensaje informativo si el usuario no tiene ID de cliente
-  if (!user?.id_cliente && !loading) {
+  if (!user?.id_cliente && !loading && !usarDatosEjemplo) {
     return (
       <div className="ordenes-trabajo-container">
         <h1>Mis Órdenes de Trabajo</h1>
@@ -224,6 +337,12 @@ const OrdenesTrabajoUsuario = () => {
           <p>Su cuenta de usuario no está vinculada a ningún cliente en el sistema.</p>
           <p>Por favor, póngase en contacto con el administrador para vincular su cuenta a un cliente.</p>
           <p className="info">Información de usuario: {user?.email}</p>
+          
+          <div className="error-actions">
+            <button className="continue-button" onClick={handleUsarDatosEjemplo}>
+              Usar datos de ejemplo
+            </button>
+          </div>
         </div>
       </div>
     );
@@ -241,7 +360,7 @@ const OrdenesTrabajoUsuario = () => {
     );
   }
 
-  if (error && !modoEdicion) {
+  if (error && !modoEdicion && !usarDatosEjemplo) {
     return (
       <div className="ordenes-trabajo-container">
         <h1>Mis Órdenes de Trabajo</h1>
@@ -249,9 +368,22 @@ const OrdenesTrabajoUsuario = () => {
           <div className="icon">❌</div>
           <h2>Ha ocurrido un error</h2>
           <p>{error}</p>
-          <button className="retry-button" onClick={() => window.location.reload()}>
-            Intentar nuevamente
-          </button>
+          <div className="error-actions">
+            <button className="retry-button" onClick={() => window.location.reload()}>
+              Intentar nuevamente
+            </button>
+            {error.includes('sesión') && (
+              <button className="login-button" onClick={handleSessionExpired}>
+                Volver a iniciar sesión
+              </button>
+            )}
+            <button className="continue-button" onClick={handleUsarDatosEjemplo}>
+              Usar datos de ejemplo
+            </button>
+            <button className="continue-button" onClick={() => setModoEdicion(true)}>
+              Continuar de todos modos
+            </button>
+          </div>
         </div>
       </div>
     );
@@ -273,6 +405,9 @@ const OrdenesTrabajoUsuario = () => {
         {ordenes.length > 0 && !modoEdicion && (
           <div className="orders-summary">
             <span>Total de órdenes: {ordenes.length}</span>
+            {usarDatosEjemplo && (
+              <span className="demo-badge">Modo de ejemplo</span>
+            )}
           </div>
         )}
       </div>
@@ -282,6 +417,9 @@ const OrdenesTrabajoUsuario = () => {
         <div className="orden-form">
           <div className="form-header">
             <h2>Nueva Orden de Trabajo</h2>
+            {usarDatosEjemplo && (
+              <span className="demo-badge">Modo de ejemplo</span>
+            )}
           </div>
           
           <div className="form-row">
@@ -300,7 +438,7 @@ const OrdenesTrabajoUsuario = () => {
               <label>ID Cliente</label>
               <input 
                 type="text" 
-                value={user?.nombre_completo || user?.name || ''}
+                value={user?.nombre_completo || user?.name || 'Cliente'}
                 placeholder="Cliente asociado a su cuenta"
                 disabled
               />
@@ -513,7 +651,7 @@ const OrdenesTrabajoUsuario = () => {
                   
                   <div className="form-group">
                     <label>ID Cliente</label>
-                    <input type="text" value={user?.nombre_completo || user?.name || ''} disabled />
+                    <input type="text" value={user?.nombre_completo || user?.name || 'Cliente'} disabled />
                   </div>
                 </div>
                 
@@ -540,10 +678,14 @@ const OrdenesTrabajoUsuario = () => {
                         <input type="text" value={linea.cantidad} disabled />
                       </div>
                       <div className="cell tipo-cell">
-                        <input type="text" value="SERVICIO" disabled />
+                        <input type="text" value={linea.tipo || "SERVICIO"} disabled />
                       </div>
                       <div className="cell descripcion-cell">
-                        <input type="text" value={`Producto/Servicio #${linea.id_producto}`} disabled />
+                        <input 
+                          type="text" 
+                          value={linea.descripcion || `Producto/Servicio #${linea.id_producto}`} 
+                          disabled 
+                        />
                       </div>
                       <div className="cell precio-cell">
                         <input type="text" value={linea.precio_unitario.toFixed(2)} disabled />
@@ -571,6 +713,18 @@ const OrdenesTrabajoUsuario = () => {
                     disabled
                   />
                 </div>
+                
+                {/* Observaciones - si existen */}
+                {ordenActual.observaciones && (
+                  <div className="form-group observaciones">
+                    <label>Observaciones</label>
+                    <textarea 
+                      rows="3"
+                      value={ordenActual.observaciones}
+                      disabled
+                    ></textarea>
+                  </div>
+                )}
                 
                 {/* Fecha de actualización */}
                 <div className="fecha-actualizacion">
