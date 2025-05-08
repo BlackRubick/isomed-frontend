@@ -51,8 +51,10 @@
   
   .edit-input,
   .edit-textarea,
+  .edit-select,
   .form-input,
-  .form-textarea {
+  .form-textarea,
+  .form-select {
     width: 100%;
     padding: 8px;
     border: 1px solid #ddd;
@@ -64,6 +66,17 @@
   .form-textarea {
     resize: vertical;
     min-height: 60px;
+  }
+  
+  .edit-select,
+  .form-select {
+    background-color: #f9f9f9;
+    appearance: none;
+    padding-right: 25px;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23333' d='M6 8.5L1.5 4h9z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 8px center;
+    cursor: pointer;
   }
   
   .action-buttons {
@@ -187,6 +200,32 @@
     border-radius: 4px;
     margin-bottom: 20px;
     border: 1px solid #c3e6cb;
+  }
+  
+  .fixed-token-info {
+    background-color: #e9f5ff;
+    color: #0c5460;
+    padding: 12px 15px;
+    border-radius: 4px;
+    margin-bottom: 20px;
+    border: 1px solid #bee5eb;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  
+  .fixed-token-info .badge {
+    background-color: #17a2b8;
+    color: white;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 12px;
+    font-weight: bold;
+  }
+  
+  .fixed-token-info p {
+    margin: 0;
+    font-size: 14px;
   }
   
   .no-data {

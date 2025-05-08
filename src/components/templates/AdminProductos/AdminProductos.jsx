@@ -9,13 +9,19 @@ const API_URL = 'http://34.232.185.39:8000';
 // Token fijo para administrador (debe coincidir con el token configurado en el backend)
 const ADMIN_FIXED_TOKEN = "admin_fixed_token_12345";
 
+// Tipos de producto disponibles
+const TIPOS_PRODUCTO = [
+  { value: 'SERVICIO', label: 'Servicio' },
+  { value: 'INSUMO', label: 'Insumo' }
+];
+
 const AdminProductos = () => {
   const [productos, setProductos] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [editingProductId, setEditingProductId] = useState(null);
   const [formData, setFormData] = useState({
-    tipo: '',
+    tipo: TIPOS_PRODUCTO[0].value,
     descripcion: '',
     precio: 0
   });
@@ -63,9 +69,9 @@ const AdminProductos = () => {
         
         // Usar datos de ejemplo si falla la carga
         setProductos([
-          { id: 1, tipo: 'Producto A', descripcion: 'Descripción del producto A', precio: 100.00 },
-          { id: 2, tipo: 'Producto B', descripcion: 'Descripción del producto B', precio: 150.50 },
-          { id: 3, tipo: 'Producto C', descripcion: 'Descripción del producto C', precio: 200.75 }
+          { id: 1, tipo: 'SERVICIO', descripcion: 'Descripción del servicio', precio: 100.00 },
+          { id: 2, tipo: 'INSUMO', descripcion: 'Descripción del insumo', precio: 150.50 },
+          { id: 3, tipo: 'SERVICIO', descripcion: 'Otro servicio', precio: 200.75 }
         ]);
       } finally {
         setLoading(false);
@@ -81,7 +87,7 @@ const AdminProductos = () => {
   const handleEditClick = (producto) => {
     setEditingProductId(producto.id);
     setFormData({
-      tipo: producto.tipo || '',
+      tipo: producto.tipo || TIPOS_PRODUCTO[0].value,
       descripcion: producto.descripcion || '',
       precio: producto.precio || 0
     });
@@ -206,7 +212,7 @@ const AdminProductos = () => {
       
       // Limpiar formulario
       setFormData({
-        tipo: '',
+        tipo: TIPOS_PRODUCTO[0].value,
         descripcion: '',
         precio: 0
       });
@@ -284,7 +290,7 @@ const AdminProductos = () => {
   const handleShowAddForm = () => {
     setShowAddForm(true);
     setFormData({
-      tipo: '',
+      tipo: TIPOS_PRODUCTO[0].value,
       descripcion: '',
       precio: 0
     });
@@ -304,6 +310,12 @@ const AdminProductos = () => {
     });
   };
   
+  // Obtener etiqueta para mostrar según el valor del tipo
+  const getTipoLabel = (tipoValue) => {
+    const tipo = TIPOS_PRODUCTO.find(t => t.value === tipoValue);
+    return tipo ? tipo.label : tipoValue;
+  };
+  
   if (loading) {
     return <div className="admin-productos-container loading">Cargando productos...</div>;
   }
@@ -311,7 +323,7 @@ const AdminProductos = () => {
   return (
     <div className="admin-productos-container">
       <h2>Gestión de Productos</h2>
-      <p>Administra los productos del sistema.</p>
+      <p>Administra los servicios e insumos del sistema.</p>
       
       {error && <div className="error-message">{error}</div>}
       {successMessage && <div className="success-message">{successMessage}</div>}
@@ -332,17 +344,21 @@ const AdminProductos = () => {
           <h3>Agregar Nuevo Producto</h3>
           <div className="add-form">
             <div className="form-group">
-              <label htmlFor="tipo">Tipo *</label>
-              <input
-                type="text"
+              <label htmlFor="tipo">Tipo de Producto *</label>
+              <select
                 id="tipo"
                 name="tipo"
                 value={formData.tipo}
                 onChange={handleInputChange}
-                className="form-input"
-                placeholder="Tipo de producto"
+                className="form-select"
                 required
-              />
+              >
+                {TIPOS_PRODUCTO.map(tipo => (
+                  <option key={tipo.value} value={tipo.value}>
+                    {tipo.label}
+                  </option>
+                ))}
+              </select>
             </div>
             
             <div className="form-group">
@@ -408,17 +424,21 @@ const AdminProductos = () => {
                   <td>{producto.id}</td>
                   <td>
                     {editingProductId === producto.id ? (
-                      <input
-                        type="text"
+                      <select
                         name="tipo"
                         value={formData.tipo}
                         onChange={handleInputChange}
-                        className="edit-input"
-                        placeholder="Tipo de producto"
+                        className="edit-select"
                         required
-                      />
+                      >
+                        {TIPOS_PRODUCTO.map(tipo => (
+                          <option key={tipo.value} value={tipo.value}>
+                            {tipo.label}
+                          </option>
+                        ))}
+                      </select>
                     ) : (
-                      producto.tipo
+                      getTipoLabel(producto.tipo)
                     )}
                   </td>
                   <td>
