@@ -9,6 +9,27 @@ const API_URL = 'http://34.232.185.39:8000';
 // Token fijo para administrador (debe coincidir con el token configurado en el backend)
 const ADMIN_FIXED_TOKEN = "admin_fixed_token_12345";
 
+// Lista de clientes/empresas de la base de datos
+const EMPRESAS_REALES = [
+  { id: 1, nombre: 'HOSPITAL SAN LUCAS' },
+  { id: 2, nombre: 'JORGE PASTRANA DE PEDRERO' },
+  { id: 3, nombre: 'REMOLQUES DEL SURESTE S.A DE C.V.' },
+  { id: 4, nombre: 'CENTRO MEDICO NEFROLOGO DE CHIAPAS' },
+  { id: 5, nombre: 'CENTRO RADIOLOGICO DEL SURESTE' },
+  { id: 6, nombre: 'BANCO DE ALIMENTOS DEL CENTRO DE CHIAPAS AC' },
+  { id: 7, nombre: 'ROXANA SOLIS SOLIS' },
+  { id: 8, nombre: 'JUAN CARLOS DE LEON BETANZOS' },
+  { id: 9, nombre: 'ANA CHRISTINA ORANTES GOMEZ' },
+  { id: 10, nombre: 'HORACIO MARTINEZ PUON' },
+  { id: 11, nombre: 'CESAR EDUARDO NUCAMENDI GONZALEZ' },
+  { id: 12, nombre: 'CONECTIA INTERNET A UN SOLO CLICK' },
+  { id: 13, nombre: 'MEDICA DEL SURESTE' },
+  { id: 14, nombre: 'HOSPITAL DE LAS CULTURAS DE CHIAPAS' },
+  { id: 15, nombre: 'HOSPITAL BASICO COMUNITARIO DE CHAMULA' },
+  { id: 16, nombre: 'PIXMA TRABAJOS DE SERIGRAFIA' },
+  { id: 17, nombre: 'OVILLA Y ASOCIADOS FIRMA JURIDICA' }
+];
+
 const AdminUsuarios = () => {
   const [usuarios, setUsuarios] = useState([]);
   const [clientes, setClientes] = useState([]);
@@ -56,8 +77,7 @@ const AdminUsuarios = () => {
         console.log("Usuarios cargados:", usuariosData);
         setUsuarios(usuariosData);
         
-        // Cargar clientes
-        // Primero intentamos con la API usando el token fijo
+        // Cargar clientes de la API
         try {
           const clientesResponse = await fetch(`${API_URL}/api/clientes`, {
             headers: {
@@ -67,30 +87,25 @@ const AdminUsuarios = () => {
           
           if (clientesResponse.ok) {
             const clientesData = await clientesResponse.json();
-            console.log("Clientes cargados:", clientesData);
+            console.log("Clientes cargados desde API:", clientesData);
             setClientes(clientesData);
           } else {
-            console.warn("Error al cargar clientes desde API, usando datos de respaldo");
-            // Usar datos de respaldo si falla
-            setClientes([
-              { id: 1, nombre: 'Empresa A' },
-              { id: 2, nombre: 'Empresa B' },
-              { id: 3, nombre: 'Empresa C' }
-            ]);
+            console.warn("Error al cargar clientes desde API, usando datos locales");
+            // Usar las empresas reales definidas anteriormente
+            setClientes(EMPRESAS_REALES);
           }
         } catch (clienteError) {
           console.warn("Error al cargar clientes:", clienteError);
-          // Usar datos de respaldo
-          setClientes([
-            { id: 1, nombre: 'Empresa A' },
-            { id: 2, nombre: 'Empresa B' },
-            { id: 3, nombre: 'Empresa C' }
-          ]);
+          // Usar las empresas reales definidas anteriormente
+          setClientes(EMPRESAS_REALES);
         }
         
       } catch (error) {
         console.error("Error al cargar datos:", error);
         setError(error.message || 'Error al cargar datos');
+        
+        // Si hay error al cargar usuarios, al menos mostrar la lista de empresas
+        setClientes(EMPRESAS_REALES);
       } finally {
         setLoading(false);
       }
@@ -113,10 +128,25 @@ const AdminUsuarios = () => {
   // Manejar cambio en formulario
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    setFormData({
-      ...formData,
-      [name]: value
-    });
+    
+    // Si el cambio es en el id_cliente, podemos generar un número de cliente predeterminado
+    if (name === 'id_cliente' && value) {
+      // Crear un número de cliente basado en el ID de la empresa
+      // Por ejemplo: "C-001" para la empresa con ID 1
+      const clienteId = parseInt(value);
+      const numeroClienteFormateado = `C-${clienteId.toString().padStart(3, '0')}`;
+      
+      setFormData({
+        ...formData,
+        [name]: value,
+        numero_cliente: numeroClienteFormateado
+      });
+    } else {
+      setFormData({
+        ...formData,
+        [name]: value
+      });
+    }
   };
   
   // Guardar cambios
@@ -292,6 +322,7 @@ const AdminUsuarios = () => {
                         value={formData.numero_cliente}
                         onChange={handleInputChange}
                         className="edit-input"
+                        placeholder="Número de cliente"
                       />
                     ) : (
                       usuario.numero_cliente || '-'
