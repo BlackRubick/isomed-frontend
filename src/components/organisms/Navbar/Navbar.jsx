@@ -113,9 +113,6 @@ const Navbar = () => {
                 ) : (
                   // Menú para usuarios normales
                   <>
-                    <NavLink to="/profile" className="dropdown-item">Mi Perfil</NavLink>
-                    <NavLink to="/mis-pedidos" className="dropdown-item">Mis Pedidos</NavLink>
-                    <NavLink to="/settings" className="dropdown-item">Configuración</NavLink>
                   </>
                 )}
                 <button onClick={handleLogout} className="dropdown-item logout">
