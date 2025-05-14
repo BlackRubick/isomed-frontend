@@ -142,7 +142,7 @@
   background-color: white;
   border-radius: 8px;
   box-shadow: 0 5px 15px rgba(0,0,0,0.1);
-  width: 200px;
+  width: 240px;
   z-index: 1000;
   margin-top: 10px;
   padding: 8px 0;
@@ -175,6 +175,54 @@
   cursor: pointer;
   font-weight: 600;
   font-size: 0.9rem;
+}
+
+/* Estilos para el menú de catálogos */
+.dropdown-catalog {
+  position: relative;
+}
+
+.dropdown-catalog-button {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  padding: 10px 15px;
+  color: #333;
+  text-decoration: none;
+  transition: background-color 0.3s ease;
+  font-size: 0.9rem;
+  background: none;
+  border: none;
+  cursor: pointer;
+  text-align: left;
+}
+
+.dropdown-catalog-button:hover {
+  background-color: #f5f5f5;
+}
+
+.dropdown-catalog-button .dropdown-icon {
+  margin-left: 8px;
+}
+
+.catalog-submenu {
+  border-top: 1px solid #f0f0f0;
+  border-bottom: 1px solid #f0f0f0;
+  background-color: #f9f9f9;
+}
+
+.catalog-submenu .dropdown-item {
+  padding-left: 30px;
+  font-size: 0.85rem;
+  position: relative;
+}
+
+.catalog-submenu .dropdown-item:before {
+  content: '•';
+  position: absolute;
+  left: 15px;
+  color: #008040;
 }
 
 @media (max-width: 768px) {
@@ -216,5 +264,9 @@
   
   .user-name {
     display: none;
+  }
+  
+  .user-dropdown {
+    width: 200px;
   }
 }
