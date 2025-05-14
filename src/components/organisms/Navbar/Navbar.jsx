@@ -9,6 +9,7 @@ const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [showUserMenu, setShowUserMenu] = useState(false);
   const [showCatalogMenu, setShowCatalogMenu] = useState(false);
+  const [showClientMenu, setShowClientMenu] = useState(false);
   const { isAuthenticated, user, isAdmin, logout } = useContext(AppContext);
   
   const navigate = useNavigate();
@@ -31,8 +32,9 @@ const Navbar = () => {
   
   const toggleUserMenu = () => {
     setShowUserMenu(!showUserMenu);
-    // Cierra el menú de catálogos si está abierto
+    // Cierra los submenús si están abiertos
     if (showCatalogMenu) setShowCatalogMenu(false);
+    if (showClientMenu) setShowClientMenu(false);
   };
   
   const toggleCatalogMenu = (e) => {
@@ -61,6 +63,7 @@ const Navbar = () => {
       if (userMenuContainer && !userMenuContainer.contains(event.target) && showUserMenu) {
         setShowUserMenu(false);
         setShowCatalogMenu(false);
+        setShowClientMenu(false);
       }
     };
 
@@ -146,6 +149,34 @@ const Navbar = () => {
                           <NavLink to="/admin/usuarios" className="dropdown-item">Ver lista de usuarios</NavLink>
                           <NavLink to="/admin/tipos-usuario" className="dropdown-item">Ver lista de tipos de usuario</NavLink>
                           <NavLink to="/admin/figura-fiscal" className="dropdown-item">Ver lista de figura fiscal</NavLink>
+                        </div>
+                      )}
+                    </div>
+                    <div className="dropdown-catalog">
+                      <button className="dropdown-catalog-button" onClick={(e) => {
+                        e.stopPropagation();
+                        setShowClientMenu(!showClientMenu);
+                      }}>
+                        Clientes
+                        <svg 
+                          className={`dropdown-icon ${showClientMenu ? 'active' : ''}`} 
+                          xmlns="http://www.w3.org/2000/svg" 
+                          width="16" 
+                          height="16" 
+                          viewBox="0 0 24 24" 
+                          fill="none" 
+                          stroke="currentColor" 
+                          strokeWidth="2" 
+                          strokeLinecap="round" 
+                          strokeLinejoin="round"
+                        >
+                          <polyline points="9 18 15 12 9 6"></polyline>
+                        </svg>
+                      </button>
+                      {showClientMenu && (
+                        <div className="catalog-submenu">
+                          <NavLink to="/admin/lista-clientes" className="dropdown-item">Ver lista de clientes</NavLink>
+                          <NavLink to="/admin/agregar-cliente" className="dropdown-item">Agregar cliente</NavLink>
                         </div>
                       )}
                     </div>
