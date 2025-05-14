@@ -14,6 +14,7 @@ import AdminUsuarios from "./pages/AdminUsuarios";
 import AdminProductos from "./pages/AdminProductos"; 
 import OrdenesTrabajoUsuario from "./pages/OrdenesTrabajoUsuario"; 
 import ListaTiposUsuario from "./pages/ListaTiposUsuario"; 
+import ListaFiguraFiscal from "./pages/ListaFiguraFiscal"; 
 import { AppContext } from "./context/AppContext";
 
 // Componente para rutas protegidas
@@ -68,6 +69,16 @@ const AppRoutes = () => {
         element={
           <ProtectedRoute requiredRole="admin">
             <ListaTiposUsuario />
+          </ProtectedRoute>
+        } 
+      />
+      
+      {/* Ruta para figura fiscal */}
+      <Route 
+        path="/admin/figura-fiscal" 
+        element={
+          <ProtectedRoute requiredRole="admin">
+            <ListaFiguraFiscal />
           </ProtectedRoute>
         } 
       />
