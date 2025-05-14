@@ -12,7 +12,8 @@ import PedidosAdmin from "./pages/PedidosAdmin";
 import SolicitarPedido from "./pages/SolicitarPedido"; 
 import AdminUsuarios from "./pages/AdminUsuarios"; 
 import AdminProductos from "./pages/AdminProductos"; 
-import OrdenesTrabajoUsuario from "./pages/OrdenesTrabajoUsuario"; // Importar nueva página
+import OrdenesTrabajoUsuario from "./pages/OrdenesTrabajoUsuario"; 
+import ListaTiposUsuario from "./pages/ListaTiposUsuario"; 
 import { AppContext } from "./context/AppContext";
 
 // Componente para rutas protegidas
@@ -57,6 +58,16 @@ const AppRoutes = () => {
         element={
           <ProtectedRoute requiredRole="admin">
             <AdminUsuarios />
+          </ProtectedRoute>
+        } 
+      />
+      
+      {/* Ruta para tipos de usuario */}
+      <Route 
+        path="/admin/tipos-usuario" 
+        element={
+          <ProtectedRoute requiredRole="admin">
+            <ListaTiposUsuario />
           </ProtectedRoute>
         } 
       />

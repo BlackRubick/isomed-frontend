@@ -139,8 +139,7 @@ const Navbar = () => {
                 {userIsAdmin ? (
                   // Menú para admin
                   <>
-                    <NavLink to="/pedidos-admin" className="dropdown-item">Gestión de Pedidos</NavLink>
-                    
+                                      
                     {/* Menú Catálogos */}
                     <div className="dropdown-catalog">
                       <button className="dropdown-catalog-button" onClick={toggleCatalogMenu}>
@@ -305,7 +304,6 @@ const Navbar = () => {
                       )}
                     </div>
                     
-                    <NavLink to="/admin/productos" className="dropdown-item">Gestión de Productos</NavLink>
                   </>
                 ) : (
                   // Menú para usuarios normales
