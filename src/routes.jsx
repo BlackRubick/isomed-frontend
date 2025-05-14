@@ -15,7 +15,8 @@ import AdminProductos from "./pages/AdminProductos";
 import OrdenesTrabajoUsuario from "./pages/OrdenesTrabajoUsuario"; 
 import ListaTiposUsuario from "./pages/ListaTiposUsuario"; 
 import ListaFiguraFiscal from "./pages/ListaFiguraFiscal"; 
-import ListaClientes from "./pages/ListaClientes"; 
+import ListaClientes from "./pages/ListaClientes";
+import ListaProveedores from "./pages/ListaProveedores"; 
 import { AppContext } from "./context/AppContext";
 
 // Componente para rutas protegidas
@@ -90,6 +91,16 @@ const AppRoutes = () => {
         element={
           <ProtectedRoute requiredRole="admin">
             <ListaClientes />
+          </ProtectedRoute>
+        } 
+      />
+      
+      {/* Rutas para proveedores */}
+      <Route 
+        path="/admin/lista-proveedores" 
+        element={
+          <ProtectedRoute requiredRole="admin">
+            <ListaProveedores />
           </ProtectedRoute>
         } 
       />
