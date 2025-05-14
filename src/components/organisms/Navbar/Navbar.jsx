@@ -197,7 +197,7 @@ const Navbar = () => {
                       {showClientMenu && (
                         <div className="catalog-submenu">
                           <NavLink to="/admin/lista-clientes" className="dropdown-item">Ver lista de clientes</NavLink>
-                          <NavLink to="/admin/agregar-cliente" className="dropdown-item">Agregar cliente</NavLink>
+                          
                         </div>
                       )}
                     </div>
