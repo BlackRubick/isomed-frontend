@@ -10,6 +10,9 @@ const Navbar = () => {
   const [showUserMenu, setShowUserMenu] = useState(false);
   const [showCatalogMenu, setShowCatalogMenu] = useState(false);
   const [showClientMenu, setShowClientMenu] = useState(false);
+  const [showProveedorMenu, setShowProveedorMenu] = useState(false);
+  const [showProductoMenu, setShowProductoMenu] = useState(false);
+  const [showOTMenu, setShowOTMenu] = useState(false);
   const { isAuthenticated, user, isAdmin, logout } = useContext(AppContext);
   
   const navigate = useNavigate();
@@ -35,11 +38,19 @@ const Navbar = () => {
     // Cierra los submenús si están abiertos
     if (showCatalogMenu) setShowCatalogMenu(false);
     if (showClientMenu) setShowClientMenu(false);
+    if (showProveedorMenu) setShowProveedorMenu(false);
+    if (showProductoMenu) setShowProductoMenu(false);
+    if (showOTMenu) setShowOTMenu(false);
   };
   
   const toggleCatalogMenu = (e) => {
     e.stopPropagation(); // Evitar que el clic afecte a otros elementos
     setShowCatalogMenu(!showCatalogMenu);
+    // Cerrar otros submenús si están abiertos
+    if (showClientMenu) setShowClientMenu(false);
+    if (showProveedorMenu) setShowProveedorMenu(false);
+    if (showProductoMenu) setShowProductoMenu(false);
+    if (showOTMenu) setShowOTMenu(false);
   };
   
   const handleLogout = () => {
@@ -64,6 +75,9 @@ const Navbar = () => {
         setShowUserMenu(false);
         setShowCatalogMenu(false);
         setShowClientMenu(false);
+        setShowProveedorMenu(false);
+        setShowProductoMenu(false);
+        setShowOTMenu(false);
       }
     };
 
@@ -126,6 +140,8 @@ const Navbar = () => {
                   // Menú para admin
                   <>
                     <NavLink to="/pedidos-admin" className="dropdown-item">Gestión de Pedidos</NavLink>
+                    
+                    {/* Menú Catálogos */}
                     <div className="dropdown-catalog">
                       <button className="dropdown-catalog-button" onClick={toggleCatalogMenu}>
                         Catálogos
@@ -152,10 +168,16 @@ const Navbar = () => {
                         </div>
                       )}
                     </div>
+                    
+                    {/* Menú Clientes */}
                     <div className="dropdown-catalog">
                       <button className="dropdown-catalog-button" onClick={(e) => {
                         e.stopPropagation();
                         setShowClientMenu(!showClientMenu);
+                        if (showCatalogMenu) setShowCatalogMenu(false);
+                        if (showProveedorMenu) setShowProveedorMenu(false);
+                        if (showProductoMenu) setShowProductoMenu(false);
+                        if (showOTMenu) setShowOTMenu(false);
                       }}>
                         Clientes
                         <svg 
@@ -180,6 +202,109 @@ const Navbar = () => {
                         </div>
                       )}
                     </div>
+                    
+                    {/* Menú Proveedores */}
+                    <div className="dropdown-catalog">
+                      <button className="dropdown-catalog-button" onClick={(e) => {
+                        e.stopPropagation();
+                        setShowProveedorMenu(!showProveedorMenu);
+                        if (showCatalogMenu) setShowCatalogMenu(false);
+                        if (showClientMenu) setShowClientMenu(false);
+                        if (showProductoMenu) setShowProductoMenu(false);
+                        if (showOTMenu) setShowOTMenu(false);
+                      }}>
+                        Proveedores
+                        <svg 
+                          className={`dropdown-icon ${showProveedorMenu ? 'active' : ''}`} 
+                          xmlns="http://www.w3.org/2000/svg" 
+                          width="16" 
+                          height="16" 
+                          viewBox="0 0 24 24" 
+                          fill="none" 
+                          stroke="currentColor" 
+                          strokeWidth="2" 
+                          strokeLinecap="round" 
+                          strokeLinejoin="round"
+                        >
+                          <polyline points="9 18 15 12 9 6"></polyline>
+                        </svg>
+                      </button>
+                      {showProveedorMenu && (
+                        <div className="catalog-submenu">
+                          <NavLink to="/admin/lista-proveedores" className="dropdown-item">Lista de proveedores</NavLink>
+                        </div>
+                      )}
+                    </div>
+                    
+                    {/* Menú Productos e Insumos */}
+                    <div className="dropdown-catalog">
+                      <button className="dropdown-catalog-button" onClick={(e) => {
+                        e.stopPropagation();
+                        setShowProductoMenu(!showProductoMenu);
+                        if (showCatalogMenu) setShowCatalogMenu(false);
+                        if (showClientMenu) setShowClientMenu(false);
+                        if (showProveedorMenu) setShowProveedorMenu(false);
+                        if (showOTMenu) setShowOTMenu(false);
+                      }}>
+                        Productos e Insumos
+                        <svg 
+                          className={`dropdown-icon ${showProductoMenu ? 'active' : ''}`} 
+                          xmlns="http://www.w3.org/2000/svg" 
+                          width="16" 
+                          height="16" 
+                          viewBox="0 0 24 24" 
+                          fill="none" 
+                          stroke="currentColor" 
+                          strokeWidth="2" 
+                          strokeLinecap="round" 
+                          strokeLinejoin="round"
+                        >
+                          <polyline points="9 18 15 12 9 6"></polyline>
+                        </svg>
+                      </button>
+                      {showProductoMenu && (
+                        <div className="catalog-submenu">
+                          <NavLink to="/admin/lista-productos" className="dropdown-item">Lista de productos</NavLink>
+                          <NavLink to="/admin/agregar-producto" className="dropdown-item">Agregar productos e insumos</NavLink>
+                        </div>
+                      )}
+                    </div>
+                    
+                    {/* Menú Órdenes de Trabajo */}
+                    <div className="dropdown-catalog">
+                      <button className="dropdown-catalog-button" onClick={(e) => {
+                        e.stopPropagation();
+                        setShowOTMenu(!showOTMenu);
+                        if (showCatalogMenu) setShowCatalogMenu(false);
+                        if (showClientMenu) setShowClientMenu(false);
+                        if (showProveedorMenu) setShowProveedorMenu(false);
+                        if (showProductoMenu) setShowProductoMenu(false);
+                      }}>
+                        Orden de Trabajo
+                        <svg 
+                          className={`dropdown-icon ${showOTMenu ? 'active' : ''}`} 
+                          xmlns="http://www.w3.org/2000/svg" 
+                          width="16" 
+                          height="16" 
+                          viewBox="0 0 24 24" 
+                          fill="none" 
+                          stroke="currentColor" 
+                          strokeWidth="2" 
+                          strokeLinecap="round" 
+                          strokeLinejoin="round"
+                        >
+                          <polyline points="9 18 15 12 9 6"></polyline>
+                        </svg>
+                      </button>
+                      {showOTMenu && (
+                        <div className="catalog-submenu">
+                          <NavLink to="/admin/todas-ordenes" className="dropdown-item">Ver todas las órdenes de trabajo</NavLink>
+                          <NavLink to="/admin/generar-orden" className="dropdown-item">Generar orden de trabajo</NavLink>
+                          <NavLink to="/admin/estatus-ot" className="dropdown-item">Todos los estatus de OT'S</NavLink>
+                        </div>
+                      )}
+                    </div>
+                    
                     <NavLink to="/admin/productos" className="dropdown-item">Gestión de Productos</NavLink>
                   </>
                 ) : (
