@@ -31,7 +31,7 @@ const Login = () => {
     setLoading(true);
     
     // Verificar si es el usuario admin
-    if (email === 'admin@hotmail.com' && password === 'admin123') {
+    if (email === 'admin@isomed.com.mx' && password === 'admin123') {
       console.log("Iniciando sesión como administrador");
       const adminUser = {
         email,
