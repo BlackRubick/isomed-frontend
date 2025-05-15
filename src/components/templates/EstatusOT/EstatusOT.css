@@ -1,0 +1,141 @@
+/* EstatusOT.css */
+.estatus-ot-vista {
+    font-family: Arial, sans-serif;
+    width: 100%;
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 15px;
+    background-color: #f0f0f0;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    box-shadow: 0 0 5px rgba(0, 0, 0, 0.2);
+  }
+  
+  .estatus-ot-vista h2 {
+    color: #333;
+    text-align: left;
+    margin-top: 0;
+    margin-bottom: 20px;
+    font-size: 16px;
+    font-weight: bold;
+  }
+  
+  .estatus-ot-loading {
+    text-align: center;
+    padding: 20px;
+    font-style: italic;
+    color: #666;
+  }
+  
+  .error-message {
+    background-color: #ffebee;
+    color: #c62828;
+    padding: 10px;
+    margin-bottom: 15px;
+    border: 1px solid #ef9a9a;
+    border-radius: 4px;
+  }
+  
+  .agregar-estado {
+    display: flex;
+    margin-bottom: 20px;
+    gap: 10px;
+  }
+  
+  .agregar-estado input {
+    flex: 1;
+    padding: 8px 10px;
+    border: 1px solid #ccc;
+    border-radius: 3px;
+    font-size: 14px;
+  }
+  
+  .agregar-estado button {
+    background-color: #f5f5f5;
+    border: 1px solid #ccc;
+    padding: 8px 15px;
+    border-radius: 3px;
+    cursor: pointer;
+    white-space: nowrap;
+    font-size: 14px;
+  }
+  
+  .agregar-estado button:hover {
+    background-color: #e0e0e0;
+  }
+  
+  .estados-table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+  
+  .estados-table th,
+  .estados-table td {
+    padding: 8px 10px;
+    text-align: left;
+    border-bottom: 1px solid #ddd;
+  }
+  
+  .estados-table th {
+    background-color: #f5f5f5;
+    font-weight: bold;
+    color: #333;
+  }
+  
+  .estados-table tr:hover {
+    background-color: #f9f9f9;
+  }
+  
+  .estados-table button {
+    padding: 6px 20px;
+    border-radius: 3px;
+    cursor: pointer;
+    width: 100%;
+    font-size: 14px;
+  }
+  
+  .estados-table button.editar {
+    background-color: #f0f0f0;
+    color: #333;
+    border: 1px solid #ccc;
+  }
+  
+  .estados-table button.editar:hover {
+    background-color: #e0e0e0;
+  }
+  
+  .estados-table button.eliminar {
+    background-color: #ffebee;
+    color: #c62828;
+    border: 1px solid #ef9a9a;
+  }
+  
+  .estados-table button.eliminar:hover {
+    background-color: #ffcdd2;
+  }
+  
+  .estados-table input {
+    width: 100%;
+    padding: 6px 8px;
+    border: 1px solid #ccc;
+    border-radius: 3px;
+  }
+  
+  /* Ajustes para hacer que la tabla se vea más como en la imagen */
+  .estados-table th:first-child,
+  .estados-table td:first-child {
+    width: 80px;
+  }
+  
+  .estados-table th:nth-child(3),
+  .estados-table th:nth-child(4),
+  .estados-table td:nth-child(3),
+  .estados-table td:nth-child(4) {
+    width: 100px;
+    text-align: center;
+  }
+  
+  .estados-table th {
+    border-top: 1px solid #ddd;
+    border-bottom: 1px solid #ddd;
+  }

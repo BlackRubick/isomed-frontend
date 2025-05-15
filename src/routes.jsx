@@ -17,7 +17,10 @@ import ListaTiposUsuario from "./pages/ListaTiposUsuario";
 import ListaFiguraFiscal from "./pages/ListaFiguraFiscal"; 
 import ListaClientes from "./pages/ListaClientes";
 import ListaProveedores from "./pages/ListaProveedores";
-import ListaProductos from "./pages/ListaProductos"; 
+import ListaProductos from "./pages/ListaProductos";
+import TodasOrdenes from "./pages/TodasOrdenes"; 
+import GenerarOrden from "./pages/GenerarOrden"; 
+import EstatusOT from "./pages/EstatusOT"; 
 import { AppContext } from "./context/AppContext";
 
 // Componente para rutas protegidas
@@ -112,6 +115,34 @@ const AppRoutes = () => {
         element={
           <ProtectedRoute requiredRole="admin">
             <ListaProductos />
+          </ProtectedRoute>
+        } 
+      />
+      
+      {/* Rutas para órdenes de trabajo */}
+      <Route 
+        path="/admin/todas-ordenes" 
+        element={
+          <ProtectedRoute requiredRole="admin">
+            <TodasOrdenes />
+          </ProtectedRoute>
+        } 
+      />
+      
+      <Route 
+        path="/admin/generar-orden" 
+        element={
+          <ProtectedRoute requiredRole="admin">
+            <GenerarOrden />
+          </ProtectedRoute>
+        } 
+      />
+      
+      <Route 
+        path="/admin/estatus-ot" 
+        element={
+          <ProtectedRoute requiredRole="admin">
+            <EstatusOT />
           </ProtectedRoute>
         } 
       />

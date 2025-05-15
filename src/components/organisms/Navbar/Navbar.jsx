@@ -298,7 +298,6 @@ const Navbar = () => {
                       {showOTMenu && (
                         <div className="catalog-submenu">
                           <NavLink to="/admin/todas-ordenes" className="dropdown-item">Ver todas las órdenes de trabajo</NavLink>
-                          <NavLink to="/admin/generar-orden" className="dropdown-item">Generar orden de trabajo</NavLink>
                           <NavLink to="/admin/estatus-ot" className="dropdown-item">Todos los estatus de OT'S</NavLink>
                         </div>
                       )}
